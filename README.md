@@ -24,6 +24,8 @@
 
 - [Overview](#overview)
 - [Quick Start](#quick-start)
+- [CLI Examples](#cli-examples)
+- [Responses API (Local)](#responses-api-local)
 - [System Flow](#system-flow)
 - [Architecture](#architecture)
 - [Token Stream (Decode)](#token-stream-decode)
@@ -35,6 +37,7 @@
 - [Core Formulas](#core-formulas)
 - [Evaluation](#evaluation)
 - [Determinism + Debugging](#determinism--debugging)
+- [Notation](#notation)
 - [Repository Layout](#repository-layout)
 - [Roadmap](#roadmap)
 
@@ -49,6 +52,13 @@ MoE-Xtend is a **long-context MoE transformer system spec** with a heavy emphasi
 - **Transparent inference** via deterministic sampling controls, logprobs, and regression-minded metrics.
 - **Readable math**: every major component is paired with formulas and diagrams.
 
+**What you can do with this repo**
+
+- Run Harmony-native inference with strict sampling controls and measurable metrics (`inference.py`).
+- Serve a minimal Responses-style endpoint for local integration tests (`server.py`).
+- Stress long-context retrieval quickly with eval scripts (`evals/`).
+- Use the diagrams as a technical spec that matches the implementation (this `README.md` + `assets/`).
+
 The repo includes:
 
 - `assets/`: all diagrams/animations (local, GitHub-safe)
@@ -59,6 +69,11 @@ The repo includes:
 ---
 
 <h2 id="quick-start" align="center">QUICK START</h2>
+
+**Requirements**
+
+- Python 3.9+
+- A checkpoint directory containing `config.json` and `*.safetensors`
 
 **Install**
 
@@ -107,6 +122,118 @@ python3 server.py --checkpoint "$MOE_XTEND_CHECKPOINT" --port 8000
 python3 evals/needle_haystack.py --checkpoint "$MOE_XTEND_CHECKPOINT"
 python3 evals/passkey_retrieval.py --checkpoint "$MOE_XTEND_CHECKPOINT"
 ```
+
+---
+
+<h2 id="cli-examples" align="center">CLI EXAMPLES</h2>
+
+**1) Multi-sample with shared prefill**
+
+Prefill once, then decode multiple samples by restoring KV snapshots (fast for research sweeps):
+
+```bash
+python3 inference.py \
+  --checkpoint "$MOE_XTEND_CHECKPOINT" \
+  --format harmony \
+  --prompt "Summarize MoE routing in 6 bullets." \
+  --num_samples 4 \
+  --max_tokens 180
+```
+
+**2) Logprobs + JSONL output (regression-friendly)**
+
+```bash
+python3 inference.py \
+  --checkpoint "$MOE_XTEND_CHECKPOINT" \
+  --format harmony \
+  --prompt "Return a JSON object with keys: title, risks, mitigations." \
+  --max_tokens 220 \
+  --logprobs \
+  --logprobs_json logprobs.jsonl \
+  --output_json outputs.jsonl
+```
+
+**3) Extract JSON from model output**
+
+```bash
+python3 inference.py \
+  --checkpoint "$MOE_XTEND_CHECKPOINT" \
+  --format harmony \
+  --prompt "Output ONLY valid JSON: {\\\"answer\\\": string, \\\"confidence\\\": number}." \
+  --max_tokens 120 \
+  --extract_json \
+  --json_output extracted.json
+```
+
+**4) Validate extracted JSON against a schema**
+
+```bash
+python3 inference.py \
+  --checkpoint "$MOE_XTEND_CHECKPOINT" \
+  --format harmony \
+  --prompt "Output ONLY valid JSON: {\\\"answer\\\": string, \\\"confidence\\\": number}." \
+  --max_tokens 120 \
+  --extract_json \
+  --json_schema schema.json \
+  --json_output extracted.json
+```
+
+---
+
+<h2 id="responses-api-local" align="center">RESPONSES API (LOCAL)</h2>
+
+Start the server:
+
+```bash
+python3 server.py --checkpoint "$MOE_XTEND_CHECKPOINT" --port 8000
+```
+
+Example request (messages):
+
+```bash
+curl -s http://127.0.0.1:8000/v1/responses \
+  -H 'Content-Type: application/json' \
+  -d @- <<'JSON' | python3 -m json.tool
+{
+  "messages": [
+    {"role": "system", "content": "You are a precise research assistant."},
+    {"role": "user", "content": "Explain top-k MoE routing."}
+  ],
+  "temperature": 0.2,
+  "max_output_tokens": 200,
+  "top_p": 0.95,
+  "min_p": 0.05
+}
+JSON
+```
+
+Example request (input):
+
+```bash
+curl -s http://127.0.0.1:8000/v1/responses \
+  -H 'Content-Type: application/json' \
+  -d '{"input":"Summarize KV cache update rules.","max_output_tokens":120,"temperature":0.1}' \
+  | python3 -m json.tool
+```
+
+Response shape:
+
+```json
+{
+  "output_text": "...",
+  "metrics": {
+    "prefill_ms": 0.0,
+    "decode_ms": 0.0,
+    "tokens_generated": 0
+  }
+}
+```
+
+Notes:
+
+- Stop tokens include Harmony `return` and `call` markers.
+- `logit_bias` supports either a JSON object or `token_id:bias,...`.
+- This server is intentionally minimal: it is meant for local testing and profiling loops.
 
 ---
 
@@ -185,6 +312,12 @@ for i in I:
   out += w[i] * Expert_i(x_t)
 ```
 
+**Implementation notes (this repo)**
+
+- `model.py`: `MLPBlock.forward` computes router logits, selects `topk`, normalizes weights, and evaluates only the selected experts via batched `einsum`.
+- No expert-parallel all-to-all and no capacity enforcement. This is clarity-first, not a fused-kernel implementation.
+- If you are comparing runs: `topk` ties + dtype can change routing, which changes everything downstream.
+
 ---
 
 <h2 id="attention-stack" align="center">ATTENTION STACK</h2>
@@ -222,6 +355,12 @@ A = softmax((Q K^T)/sqrt(d) + B)
 Y = A @ V
 ```
 
+**Implementation notes (this repo)**
+
+- `model.py`: `AttentionBlock.sdpa` constructs masks aligned to KV offset and appends a per-head sink bias as an extra softmax column.
+- Sliding window is applied on alternating layers (`layer_idx % 2 == 0`) to mix dense and banded patterns.
+- The easiest long-context bug is an off-by-one diagonal in the causal/window mask when switching prefill -> decode.
+
 ---
 
 <h2 id="rope--scaling" align="center">ROPE + SCALING</h2>
@@ -245,6 +384,12 @@ Interpretation:
 - Slow clocks preserve long-range structure.
 - Mid-band blends regimes to avoid phase discontinuities.
 
+**Implementation notes (this repo)**
+
+- `model.py`: `RotaryEmbedding` precomputes `cos/sin` up to `max_content_length` and indexes with `(arange(seq_len) + offset) % max_content_length`.
+- YaRN concentration is applied by scaling `cos/sin` (softens attention temperature as length grows).
+- NTK-by-parts modifies inverse frequencies using alpha/beta cutpoints and a linear ramp blend.
+
 ---
 
 <h2 id="kv-cache" align="center">KV CACHE</h2>
@@ -263,6 +408,12 @@ $$\text{bytes} \approx 2 \cdot L \cdot B \cdot T \cdot H_{kv} \cdot d \cdot \tex
 - GQA reduces `H_kv`.
 - Long contexts make `T` the dominant term.
 
+**Implementation notes (this repo)**
+
+- `model.py`: `Cache.extend` writes new K/V into preallocated tensors at indices `[offset:offset+t]`, then increments `offset`.
+- `inference.py`: caches are allocated per layer sized to `min(len(prompt)+max_tokens, max_context)`.
+- If you see shape mismatches or attention weirdness, check: KV head count (`H_kv`), `head_dim`, and the cache `offset`.
+
 ---
 
 <h2 id="sampling-controls" align="center">SAMPLING CONTROLS</h2>
@@ -276,6 +427,11 @@ $$p = \mathrm{softmax}(z/T)$$
 - **Top-k**: keep k highest probability tokens.
 - **Top-p**: keep smallest set with cumulative probability >= p.
 - **Min-p**: drop tokens with probability below a fraction of the max token probability.
+
+**Implementation notes (this repo)**
+
+- `sampling.py` applies `logit_bias`, repetition/presence/frequency penalties, then truncation (`top_k`, `top_p`, `min_p`), then samples.
+- Set `temperature=0` for greedy decode; otherwise sampling uses `torch.multinomial`.
 
 ---
 
@@ -320,6 +476,26 @@ Common long-context failure modes:
 - Mask bugs (off-by-one in window, sinks applied to wrong tokens)
 - KV cache layout mismatch (stride / head grouping)
 - MoE capacity overflow (silent drops -> accuracy cliff)
+
+---
+
+<h2 id="notation" align="center">NOTATION</h2>
+
+- `B`: batch size
+- `T`: sequence length (time)
+- `L`: transformer layers
+- `H_q`: query heads
+- `H_kv`: key/value heads (GQA)
+- `d`: head dimension
+- `W`: sliding window size
+- `E`: number of experts
+- `k`: experts per token (top-k routing)
+
+**Shape conventions**
+
+- Hidden states: `[B, T, hidden_size]`
+- Cache per layer: `K,V: [B, T_cache, H_kv, d]`
+- GQA grouping: `H_q = H_kv * groups`
 
 ---
 
