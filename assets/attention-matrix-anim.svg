@@ -1,48 +1,133 @@
-<svg width="1200" height="360" viewBox="0 0 1200 360" xmlns="http://www.w3.org/2000/svg">
+<svg width="1200" height="420" viewBox="0 0 1200 420" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#F8FAFC" />
       <stop offset="45%" stop-color="#E0F2FE" />
       <stop offset="100%" stop-color="#FCE7F3" />
     </linearGradient>
-    <linearGradient id="band" x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#06B6D4" />
       <stop offset="50%" stop-color="#8B5CF6" />
       <stop offset="100%" stop-color="#EC4899" />
     </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#CBD5E1" stroke-width="1" />
+    </pattern>
+    <pattern id="cellgrid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 H 0 V 20" fill="none" stroke="#94A3B8" stroke-width="1" opacity="0.26" />
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#0B1220" flood-opacity="0.12" />
+    </filter>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="b" />
+      <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.6 0" result="g" />
+      <feMerge>
+        <feMergeNode in="g" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <clipPath id="clipA">
+      <rect x="90" y="190" width="200" height="200" rx="12" />
+    </clipPath>
+    <clipPath id="clipB">
+      <rect x="650" y="190" width="200" height="200" rx="12" />
+    </clipPath>
+
+    <linearGradient id="scan" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0" />
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
   </defs>
-  <rect width="1200" height="360" fill="url(#bg)" />
-  <text x="60" y="50" fill="#0F172A" font-size="22" font-family="Space Grotesk, Helvetica, Arial, sans-serif">Attention Matrix (Sliding Band)</text>
-  <text x="60" y="78" fill="#475569" font-size="13" font-family="JetBrains Mono, 'Courier New', monospace">Diagonal band represents windowed attention with causal masking.</text>
 
-  <rect x="80" y="120" width="220" height="220" fill="none" stroke="#0F172A" />
-  <rect x="360" y="120" width="220" height="220" fill="none" stroke="#0F172A" />
-  <rect x="640" y="120" width="220" height="220" fill="none" stroke="#0F172A" />
-  <rect x="920" y="120" width="220" height="220" fill="none" stroke="#0F172A" />
+  <rect width="1200" height="420" fill="url(#bg)" />
+  <rect width="1200" height="420" fill="url(#grid)" opacity="0.22" />
 
-  <g fill="#E2E8F0">
-    <rect x="90" y="130" width="200" height="200" />
-    <rect x="370" y="130" width="200" height="200" />
-    <rect x="650" y="130" width="200" height="200" />
-    <rect x="930" y="130" width="200" height="200" />
+  <text x="60" y="66" fill="#0B1220" font-size="28" font-weight="800" font-family="Space Grotesk, Helvetica, Arial, sans-serif">Attention Matrix: Diagonal Band + Causal Mask</text>
+  <text x="60" y="98" fill="#334155" font-size="14" font-family="JetBrains Mono, 'Courier New', monospace">Sliding window attention is a diagonal band inside the lower triangle (causal). Pulse moves along the band to show decode progression.</text>
+  <rect x="60" y="118" width="1080" height="6" fill="url(#accent)" />
+
+  <!-- card A -->
+  <g filter="url(#shadow)">
+    <rect x="60" y="140" width="520" height="260" rx="18" fill="#FFFFFF" opacity="0.66" stroke="#0B1220" stroke-width="2" />
+  </g>
+  <rect x="60" y="140" width="520" height="6" rx="18" fill="url(#accent)" opacity="0.9" />
+  <text x="82" y="172" fill="#0B1220" font-size="14" font-weight="800" font-family="JetBrains Mono, 'Courier New', monospace">Sliding Window (W)</text>
+
+  <!-- card B -->
+  <g filter="url(#shadow)">
+    <rect x="620" y="140" width="520" height="260" rx="18" fill="#FFFFFF" opacity="0.66" stroke="#0B1220" stroke-width="2" />
+  </g>
+  <rect x="620" y="140" width="520" height="6" rx="18" fill="url(#accent)" opacity="0.9" />
+  <text x="642" y="172" fill="#0B1220" font-size="14" font-weight="800" font-family="JetBrains Mono, 'Courier New', monospace">Full Causal (Global)</text>
+
+  <!-- matrix A -->
+  <g clip-path="url(#clipA)">
+    <rect x="90" y="190" width="200" height="200" fill="#F1F5F9" />
+    <!-- causal lower triangle (j <= i) -->
+    <path d="M90 190 L90 390 L290 390 Z" fill="#CBD5E1" opacity="0.55" />
+    <!-- grid -->
+    <rect x="90" y="190" width="200" height="200" fill="url(#cellgrid)" opacity="0.8" />
+
+    <!-- static diagonal window band -->
+    <g transform="rotate(45 190 290)" opacity="0.24">
+      <rect x="-160" y="260" width="700" height="60" fill="url(#accent)" />
+    </g>
+
+    <!-- moving pulse along band -->
+    <g transform="rotate(45 190 290)" filter="url(#glow)">
+      <rect x="-320" y="274" width="120" height="32" rx="10" fill="url(#accent)" opacity="0.70">
+        <animate attributeName="x" values="-320;120;-320" dur="4.6s" repeatCount="indefinite" keyTimes="0;0.5;1" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" />
+      </rect>
+    </g>
+
+    <!-- scanline -->
+    <rect x="90" y="190" width="200" height="30" fill="url(#scan)" opacity="0.35">
+      <animate attributeName="y" values="190;360;190" dur="5.2s" repeatCount="indefinite" keyTimes="0;0.5;1" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" />
+    </rect>
+  </g>
+  <rect x="90" y="190" width="200" height="200" rx="12" fill="none" stroke="#0B1220" stroke-width="2" />
+
+  <!-- matrix B -->
+  <g clip-path="url(#clipB)">
+    <rect x="650" y="190" width="200" height="200" fill="#F1F5F9" />
+    <path d="M650 190 L650 390 L850 390 Z" fill="#CBD5E1" opacity="0.65" />
+    <rect x="650" y="190" width="200" height="200" fill="url(#cellgrid)" opacity="0.8" />
+
+    <!-- global attention pulse (decode path) -->
+    <g transform="rotate(45 750 290)" filter="url(#glow)">
+      <rect x="140" y="274" width="120" height="32" rx="10" fill="url(#accent)" opacity="0.60">
+        <animate attributeName="x" values="-260;200;-260" dur="4.6s" repeatCount="indefinite" begin="0.6s" keyTimes="0;0.5;1" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" />
+      </rect>
+    </g>
+
+    <!-- scanline -->
+    <rect x="650" y="190" width="200" height="30" fill="url(#scan)" opacity="0.35">
+      <animate attributeName="y" values="190;360;190" dur="5.2s" repeatCount="indefinite" begin="0.35s" keyTimes="0;0.5;1" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" />
+    </rect>
+  </g>
+  <rect x="650" y="190" width="200" height="200" rx="12" fill="none" stroke="#0B1220" stroke-width="2" />
+
+  <!-- callouts -->
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="12" fill="#334155">
+    <text x="320" y="206">mask:</text>
+    <text x="320" y="226">j &lt;= i (causal)</text>
+    <text x="320" y="250">window:</text>
+    <text x="320" y="270">i-W &lt;= j &lt;= i</text>
+    <text x="320" y="294">pulse:</text>
+    <text x="320" y="314">decode step highlight</text>
+
+    <text x="880" y="206">mask:</text>
+    <text x="880" y="226">j &lt;= i (causal)</text>
+    <text x="880" y="250">global:</text>
+    <text x="880" y="270">all past keys visible</text>
+    <text x="880" y="294">pulse:</text>
+    <text x="880" y="314">row-by-row decode</text>
   </g>
 
-  <g fill="url(#band)" opacity="0.6">
-    <rect x="90" y="130" width="200" height="30">
-      <animate attributeName="y" values="130;300;130" dur="4s" repeatCount="indefinite" />
-    </rect>
-    <rect x="370" y="130" width="200" height="30">
-      <animate attributeName="y" values="130;300;130" dur="4s" begin="0.5s" repeatCount="indefinite" />
-    </rect>
-    <rect x="650" y="130" width="200" height="30">
-      <animate attributeName="y" values="130;300;130" dur="4s" begin="1s" repeatCount="indefinite" />
-    </rect>
-    <rect x="930" y="130" width="200" height="30">
-      <animate attributeName="y" values="130;300;130" dur="4s" begin="1.5s" repeatCount="indefinite" />
-    </rect>
-  </g>
-
-  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="11" fill="#475569">
-    <text x="90" y="350">each matrix = attention for one head group</text>
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="12" fill="#334155">
+    <text x="60" y="414">implementation hint: represent masks as additive bias (0 or -inf) before softmax. Keep labels ASCII for SVG reliability.</text>
   </g>
 </svg>

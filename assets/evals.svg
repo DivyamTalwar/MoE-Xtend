@@ -1,43 +1,124 @@
-<svg width="1200" height="360" viewBox="0 0 1200 360" xmlns="http://www.w3.org/2000/svg">
+<svg width="1200" height="440" viewBox="0 0 1200 440" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#F8FAFC" />
       <stop offset="45%" stop-color="#E0F2FE" />
       <stop offset="100%" stop-color="#FCE7F3" />
     </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="50%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#EC4899" />
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#CBD5E1" stroke-width="1" />
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#0B1220" flood-opacity="0.12" />
+    </filter>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="b" />
+      <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.55 0" result="g" />
+      <feMerge>
+        <feMergeNode in="g" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <linearGradient id="scan" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0" />
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
   </defs>
-  <rect width="1200" height="360" fill="url(#bg)" />
-  <text x="60" y="50" fill="#0F172A" font-size="22" font-family="Space Grotesk, Helvetica, Arial, sans-serif">Long-Context Evaluations</text>
-  <text x="60" y="78" fill="#475569" font-size="13" font-family="JetBrains Mono, 'Courier New', monospace">Needle-in-haystack · Passkey retrieval · TTFT/throughput</text>
 
-  <g stroke="#0F172A" stroke-width="1" fill="none">
-    <rect x="60" y="120" width="520" height="200" />
-    <rect x="620" y="120" width="520" height="200" />
+  <rect width="1200" height="440" fill="url(#bg)" />
+  <rect width="1200" height="440" fill="url(#grid)" opacity="0.22" />
+
+  <text x="60" y="66" fill="#0B1220" font-size="30" font-weight="800" font-family="Space Grotesk, Helvetica, Arial, sans-serif">Evaluation: Retrieval, Stability, and Latency</text>
+  <text x="60" y="98" fill="#334155" font-size="14" font-family="JetBrains Mono, 'Courier New', monospace">Measure what breaks first: long-context retrieval accuracy and prefill/decode performance (TTFT, TPS).</text>
+  <rect x="60" y="118" width="1080" height="6" fill="url(#accent)" />
+
+  <!-- main card -->
+  <g filter="url(#shadow)">
+    <rect x="60" y="140" width="1080" height="270" rx="18" fill="#FFFFFF" opacity="0.66" stroke="#0B1220" stroke-width="2" />
   </g>
 
-  <text x="90" y="150" fill="#0F172A" font-size="14" font-family="JetBrains Mono, 'Courier New', monospace">Needle-in-Haystack</text>
-  <text x="650" y="150" fill="#0F172A" font-size="14" font-family="JetBrains Mono, 'Courier New', monospace">Passkey Retrieval</text>
+  <!-- eval cards -->
+  <g filter="url(#shadow)">
+    <rect x="90" y="182" width="320" height="98" rx="16" fill="#FFFFFF" opacity="0.72" stroke="#0B1220" stroke-width="2" />
+    <rect x="440" y="182" width="320" height="98" rx="16" fill="#FFFFFF" opacity="0.72" stroke="#0B1220" stroke-width="2" />
+    <rect x="790" y="182" width="320" height="98" rx="16" fill="#FFFFFF" opacity="0.72" stroke="#0B1220" stroke-width="2" />
 
-  <g fill="#E2E8F0">
-    <rect x="90" y="170" width="450" height="20" />
-    <rect x="90" y="200" width="450" height="20" />
-    <rect x="90" y="230" width="450" height="20" />
-    <rect x="90" y="260" width="450" height="20" />
+    <rect x="90" y="302" width="320" height="98" rx="16" fill="#FFFFFF" opacity="0.72" stroke="#0B1220" stroke-width="2" />
+    <rect x="440" y="302" width="320" height="98" rx="16" fill="#FFFFFF" opacity="0.72" stroke="#0B1220" stroke-width="2" />
+    <rect x="790" y="302" width="320" height="98" rx="16" fill="#FFFFFF" opacity="0.72" stroke="#0B1220" stroke-width="2" />
   </g>
-  <rect x="250" y="230" width="40" height="20" fill="#06B6D4" />
 
-  <g fill="#E2E8F0">
-    <rect x="650" y="170" width="450" height="20" />
-    <rect x="650" y="200" width="450" height="20" />
-    <rect x="650" y="230" width="450" height="20" />
-    <rect x="650" y="260" width="450" height="20" />
+  <g font-family="JetBrains Mono, 'Courier New', monospace" fill="#0B1220">
+    <text x="112" y="214" font-size="14" font-weight="800">Needle-in-Haystack</text>
+    <text x="112" y="238" font-size="12" fill="#334155">insert key at random depth; ask for it</text>
+    <text x="112" y="260" font-size="12" fill="#334155">metric: exact match / F1</text>
+
+    <text x="462" y="214" font-size="14" font-weight="800">Passkey Retrieval</text>
+    <text x="462" y="238" font-size="12" fill="#334155">model must recall a hidden passkey</text>
+    <text x="462" y="260" font-size="12" fill="#334155">metric: success rate vs length</text>
+
+    <text x="812" y="214" font-size="14" font-weight="800">Stability Sweep</text>
+    <text x="812" y="238" font-size="12" fill="#334155">vary L, W, sinks, scaling params</text>
+    <text x="812" y="260" font-size="12" fill="#334155">metric: drift / loss spikes</text>
+
+    <text x="112" y="334" font-size="14" font-weight="800">TTFT</text>
+    <text x="112" y="358" font-size="12" fill="#334155">time to first token = prefill cost</text>
+    <text x="112" y="380" font-size="12" fill="#334155">report p50/p95</text>
+
+    <text x="462" y="334" font-size="14" font-weight="800">Throughput</text>
+    <text x="462" y="358" font-size="12" fill="#334155">tokens/sec in steady-state decode</text>
+    <text x="462" y="380" font-size="12" fill="#334155">window size dominates per-step</text>
+
+    <text x="812" y="334" font-size="14" font-weight="800">Regression Harness</text>
+    <text x="812" y="358" font-size="12" fill="#334155">logprobs + JSONL outputs</text>
+    <text x="812" y="380" font-size="12" fill="#334155">diff across commits/configs</text>
   </g>
-  <rect x="820" y="170" width="60" height="20" fill="#8B5CF6">
-    <animate attributeName="x" values="660;1020;660" dur="4s" repeatCount="indefinite" />
+
+  <!-- animated progress bars -->
+  <g filter="url(#glow)">
+    <rect x="112" y="270" width="260" height="8" rx="4" fill="#E2E8F0" />
+    <rect x="112" y="270" width="160" height="8" rx="4" fill="url(#accent)" opacity="0.75">
+      <animate attributeName="width" values="90;240;140;210;90" dur="4.4s" repeatCount="indefinite" />
+    </rect>
+
+    <rect x="462" y="270" width="260" height="8" rx="4" fill="#E2E8F0" />
+    <rect x="462" y="270" width="190" height="8" rx="4" fill="url(#accent)" opacity="0.75">
+      <animate attributeName="width" values="120;250;160;220;120" dur="4.6s" repeatCount="indefinite" />
+    </rect>
+
+    <rect x="812" y="270" width="260" height="8" rx="4" fill="#E2E8F0" />
+    <rect x="812" y="270" width="140" height="8" rx="4" fill="url(#accent)" opacity="0.75">
+      <animate attributeName="width" values="70;220;110;190;70" dur="4.2s" repeatCount="indefinite" />
+    </rect>
+
+    <rect x="112" y="390" width="260" height="8" rx="4" fill="#E2E8F0" />
+    <rect x="112" y="390" width="210" height="8" rx="4" fill="url(#accent)" opacity="0.75">
+      <animate attributeName="width" values="80;240;130;220;80" dur="5.0s" repeatCount="indefinite" />
+    </rect>
+
+    <rect x="462" y="390" width="260" height="8" rx="4" fill="#E2E8F0" />
+    <rect x="462" y="390" width="150" height="8" rx="4" fill="url(#accent)" opacity="0.75">
+      <animate attributeName="width" values="60;240;120;210;60" dur="4.8s" repeatCount="indefinite" />
+    </rect>
+
+    <rect x="812" y="390" width="260" height="8" rx="4" fill="#E2E8F0" />
+    <rect x="812" y="390" width="180" height="8" rx="4" fill="url(#accent)" opacity="0.75">
+      <animate attributeName="width" values="80;250;150;230;80" dur="4.9s" repeatCount="indefinite" />
+    </rect>
+  </g>
+
+  <!-- scanline -->
+  <rect x="60" y="140" width="1080" height="36" fill="url(#scan)" opacity="0.22">
+    <animate attributeName="y" dur="6.4s" repeatCount="indefinite" values="140;372;140" keyTimes="0;0.5;1" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" />
   </rect>
 
-  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="11" fill="#475569">
-    <text x="90" y="300">metric: retrieval accuracy @ context length</text>
-    <text x="650" y="300">metric: exact passkey reproduction</text>
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="12" fill="#334155">
+    <text x="60" y="434">eval rule: always sweep context length; many bugs hide until L is large.</text>
   </g>
 </svg>

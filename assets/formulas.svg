@@ -5,32 +5,67 @@
       <stop offset="45%" stop-color="#E0F2FE" />
       <stop offset="100%" stop-color="#FCE7F3" />
     </linearGradient>
-    <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#06B6D4" />
       <stop offset="50%" stop-color="#8B5CF6" />
       <stop offset="100%" stop-color="#EC4899" />
     </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#CBD5E1" stroke-width="1" />
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#0B1220" flood-opacity="0.12" />
+    </filter>
+    <linearGradient id="scan" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0" />
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
   </defs>
+
   <rect width="1200" height="520" fill="url(#bg)" />
-  <text x="60" y="60" fill="#0F172A" font-size="28" font-family="Space Grotesk, Helvetica, Arial, sans-serif">Core Formulas</text>
-  <text x="60" y="92" fill="#475569" font-size="14" font-family="JetBrains Mono, 'Courier New', monospace">Compact reference for routing, attention, RoPE, and sampling.</text>
+  <rect width="1200" height="520" fill="url(#grid)" opacity="0.22" />
 
-  <rect x="60" y="110" width="1080" height="6" fill="url(#bar)" />
+  <text x="60" y="66" fill="#0B1220" font-size="30" font-weight="800" font-family="Space Grotesk, Helvetica, Arial, sans-serif">Core Formulas (ASCII)</text>
+  <text x="60" y="98" fill="#334155" font-size="14" font-family="JetBrains Mono, 'Courier New', monospace">Compact reference for routing, attention, RoPE, KV cache, and sampling. (ASCII labels for GitHub SVG reliability.)</text>
+  <rect x="60" y="118" width="1080" height="6" fill="url(#accent)" />
 
-  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="15" fill="#0F172A">
-    <text x="80" y="150">Attention: A = softmax((QK^T)/sqrt(d) + mask + sinks)</text>
-    <text x="80" y="178">Output: Y = A · V</text>
+  <g filter="url(#shadow)">
+    <rect x="60" y="140" width="1080" height="340" rx="18" fill="#FFFFFF" opacity="0.66" stroke="#0B1220" stroke-width="2" />
+  </g>
 
-    <text x="80" y="220">Router: s = W_r x_t</text>
-    <text x="80" y="248">Top-k: I = topk(s, k)</text>
-    <text x="80" y="276">Weights: w = softmax(s[I])</text>
-    <text x="80" y="304">MoE: y = Σ_i w_i · E_i(x_t)</text>
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="13" fill="#0B1220">
+    <text x="90" y="178" font-weight="800">ATTENTION</text>
+    <text x="90" y="202" fill="#334155">A = softmax((Q K^T)/sqrt(d) + bias + mask)</text>
+    <text x="90" y="224" fill="#334155">Y = A V</text>
 
-    <text x="80" y="346">RoPE: θ_i = b^(-2i/d)   λ_i = 2π/θ_i</text>
-    <text x="80" y="374">NTK ratio: r(i) = L·θ_i / (2π)</text>
-    <text x="80" y="402">SwiGLU: σ(α x_glu) · (x_linear + 1)</text>
+    <text x="90" y="262" font-weight="800">MOE ROUTING</text>
+    <text x="90" y="286" fill="#334155">s = W_r x_t</text>
+    <text x="90" y="308" fill="#334155">I = topk(s, k)</text>
+    <text x="90" y="330" fill="#334155">w = softmax(s[I])</text>
+    <text x="90" y="352" fill="#334155">y = sum_{i in I} w_i E_i(x_t)</text>
 
-    <text x="80" y="444">Top-p: keep smallest set with cumulative prob ≥ p</text>
-    <text x="80" y="472">Penalty: logits[t] -= freq_penalty * count[t]</text>
+    <text x="600" y="178" font-weight="800">ROPE + SCALING</text>
+    <text x="600" y="202" fill="#334155">theta_i = b^(-2i/d)</text>
+    <text x="600" y="224" fill="#334155">lambda_i = (2pi) / theta_i</text>
+    <text x="600" y="246" fill="#334155">r(i) = (L * theta_i) / (2pi)</text>
+
+    <text x="600" y="284" font-weight="800">KV CACHE</text>
+    <text x="600" y="308" fill="#334155">bytes ~= 2 * L * B * T * H_kv * d * dtype_size</text>
+    <text x="600" y="330" fill="#334155">decode: write at offset t, then t++</text>
+
+    <text x="600" y="368" font-weight="800">SAMPLING</text>
+    <text x="600" y="392" fill="#334155">p = softmax(z / T)</text>
+    <text x="600" y="414" fill="#334155">top-p: keep smallest set with cumulative mass >= p</text>
+    <text x="600" y="436" fill="#334155">min-p: drop tokens where p_i &lt; p_max * min_p</text>
+  </g>
+
+  <!-- scanline -->
+  <rect x="60" y="140" width="1080" height="36" fill="url(#scan)" opacity="0.22">
+    <animate attributeName="y" dur="6.6s" repeatCount="indefinite" values="140;444;140" keyTimes="0;0.5;1" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" />
+  </rect>
+
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="12" fill="#334155">
+    <text x="60" y="514">Note: the README uses PNG formula banners for crisp typography; this SVG is a searchable ASCII reference.</text>
   </g>
 </svg>

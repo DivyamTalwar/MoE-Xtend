@@ -1,54 +1,110 @@
-<svg width="1200" height="360" viewBox="0 0 1200 360" xmlns="http://www.w3.org/2000/svg">
+<svg width="1200" height="420" viewBox="0 0 1200 420" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#F8FAFC" />
       <stop offset="45%" stop-color="#E0F2FE" />
       <stop offset="100%" stop-color="#FCE7F3" />
     </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="50%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#EC4899" />
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#CBD5E1" stroke-width="1" />
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#0B1220" flood-opacity="0.12" />
+    </filter>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="b" />
+      <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.55 0" result="g" />
+      <feMerge>
+        <feMergeNode in="g" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <linearGradient id="scan" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0" />
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
   </defs>
-  <rect width="1200" height="360" fill="url(#bg)" />
-  <text x="60" y="50" fill="#0F172A" font-size="22" font-family="Space Grotesk, Helvetica, Arial, sans-serif">RoPE Rotation Intuition</text>
-  <text x="60" y="78" fill="#475569" font-size="13" font-family="JetBrains Mono, 'Courier New', monospace">Each pair of dimensions rotates by a frequency-dependent angle.</text>
 
-  <g transform="translate(240,190)">
-    <circle cx="0" cy="0" r="90" fill="none" stroke="#0F172A" stroke-width="1" />
-    <circle cx="0" cy="0" r="60" fill="none" stroke="#CBD5E1" stroke-width="1" />
-    <line x1="0" y1="0" x2="90" y2="0" stroke="#06B6D4" stroke-width="3">
-      <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0" to="360" dur="6s" repeatCount="indefinite" />
+  <rect width="1200" height="420" fill="url(#bg)" />
+  <rect width="1200" height="420" fill="url(#grid)" opacity="0.22" />
+
+  <text x="60" y="66" fill="#0B1220" font-size="30" font-weight="800" font-family="Space Grotesk, Helvetica, Arial, sans-serif">RoPE Rotation: Phase Clocks</text>
+  <text x="60" y="98" fill="#334155" font-size="14" font-family="JetBrains Mono, 'Courier New', monospace">Each (2D) pair rotates by angle(t,i) = t * theta_i. Fast clocks capture local order; slow clocks preserve long range.</text>
+  <rect x="60" y="118" width="1080" height="6" fill="url(#accent)" />
+
+  <!-- main card -->
+  <g filter="url(#shadow)">
+    <rect x="60" y="140" width="820" height="240" rx="18" fill="#FFFFFF" opacity="0.66" stroke="#0B1220" stroke-width="2" />
+  </g>
+
+  <!-- side card -->
+  <g filter="url(#shadow)">
+    <rect x="900" y="140" width="240" height="240" rx="18" fill="#FFFFFF" opacity="0.66" stroke="#0B1220" stroke-width="2" />
+    <rect x="900" y="140" width="240" height="6" rx="18" fill="url(#accent)" />
+    <text x="922" y="172" fill="#0B1220" font-size="14" font-weight="800" font-family="JetBrains Mono, 'Courier New', monospace">Formulas</text>
+    <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="12" fill="#334155">
+      <text x="922" y="198">theta_i = b^(-2i/d)</text>
+      <text x="922" y="218">lambda_i = 2pi/theta_i</text>
+      <text x="922" y="238">angle = t * theta_i</text>
+      <text x="922" y="266">YaRN/NTK-by-parts</text>
+      <text x="922" y="286">modulate theta bands</text>
+      <text x="922" y="306">to extend context</text>
+      <text x="922" y="334">keep labels ASCII</text>
+    </g>
+  </g>
+
+  <!-- three clocks -->
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="12" fill="#334155">
+    <text x="140" y="176">fast</text>
+    <text x="420" y="176">mid</text>
+    <text x="700" y="176">slow</text>
+  </g>
+
+  <g transform="translate(200,270)">
+    <circle cx="0" cy="0" r="92" fill="none" stroke="#0B1220" stroke-width="2" />
+    <circle cx="0" cy="0" r="64" fill="none" stroke="#CBD5E1" stroke-width="2" />
+    <line x1="0" y1="0" x2="92" y2="0" stroke="#06B6D4" stroke-width="4" filter="url(#glow)">
+      <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="4.8s" repeatCount="indefinite" />
     </line>
-    <circle cx="90" cy="0" r="6" fill="#06B6D4">
-      <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0" to="360" dur="6s" repeatCount="indefinite" />
+    <circle cx="92" cy="0" r="7" fill="#06B6D4" filter="url(#glow)">
+      <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="4.8s" repeatCount="indefinite" />
     </circle>
   </g>
 
-  <g transform="translate(520,190)">
-    <circle cx="0" cy="0" r="90" fill="none" stroke="#0F172A" stroke-width="1" />
-    <line x1="0" y1="0" x2="90" y2="0" stroke="#8B5CF6" stroke-width="3">
-      <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0" to="360" dur="10s" repeatCount="indefinite" />
+  <g transform="translate(480,270)">
+    <circle cx="0" cy="0" r="92" fill="none" stroke="#0B1220" stroke-width="2" />
+    <circle cx="0" cy="0" r="64" fill="none" stroke="#CBD5E1" stroke-width="2" />
+    <line x1="0" y1="0" x2="92" y2="0" stroke="#8B5CF6" stroke-width="4" filter="url(#glow)">
+      <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="8.8s" repeatCount="indefinite" />
     </line>
-    <circle cx="90" cy="0" r="6" fill="#8B5CF6">
-      <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0" to="360" dur="10s" repeatCount="indefinite" />
+    <circle cx="92" cy="0" r="7" fill="#8B5CF6" filter="url(#glow)">
+      <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="8.8s" repeatCount="indefinite" />
     </circle>
   </g>
 
-  <g transform="translate(800,190)">
-    <circle cx="0" cy="0" r="90" fill="none" stroke="#0F172A" stroke-width="1" />
-    <line x1="0" y1="0" x2="90" y2="0" stroke="#EC4899" stroke-width="3">
-      <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0" to="360" dur="14s" repeatCount="indefinite" />
+  <g transform="translate(760,270)">
+    <circle cx="0" cy="0" r="92" fill="none" stroke="#0B1220" stroke-width="2" />
+    <circle cx="0" cy="0" r="64" fill="none" stroke="#CBD5E1" stroke-width="2" />
+    <line x1="0" y1="0" x2="92" y2="0" stroke="#EC4899" stroke-width="4" filter="url(#glow)">
+      <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="14.0s" repeatCount="indefinite" />
     </line>
-    <circle cx="90" cy="0" r="6" fill="#EC4899">
-      <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0" to="360" dur="14s" repeatCount="indefinite" />
+    <circle cx="92" cy="0" r="7" fill="#EC4899" filter="url(#glow)">
+      <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="14.0s" repeatCount="indefinite" />
     </circle>
   </g>
 
-  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="12" fill="#475569">
-    <text x="100" y="330">fast clocks capture local structure</text>
-    <text x="440" y="330">mid clocks blend local + global</text>
-    <text x="770" y="330">slow clocks preserve long-range</text>
-  </g>
+  <!-- scanline -->
+  <rect x="60" y="140" width="820" height="36" fill="url(#scan)" opacity="0.22">
+    <animate attributeName="y" dur="6.2s" repeatCount="indefinite" values="140;344;140" keyTimes="0;0.5;1" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" />
+  </rect>
 
-  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="12" fill="#0F172A">
-    <text x="60" y="110">theta_i = b^(-2i/d)</text>
-    <text x="60" y="130">lambda_i = 2pi / theta_i</text>
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="12" fill="#334155">
+    <text x="60" y="414">interpretation: clocks are frequencies; NTK-by-parts chooses which bands to preserve vs stretch for long context.</text>
   </g>
 </svg>

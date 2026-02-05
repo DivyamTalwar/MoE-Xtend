@@ -1,33 +1,75 @@
-<svg width="1200" height="340" viewBox="0 0 1200 340" xmlns="http://www.w3.org/2000/svg">
+<svg width="1200" height="420" viewBox="0 0 1200 420" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#F8FAFC" />
       <stop offset="45%" stop-color="#E0F2FE" />
       <stop offset="100%" stop-color="#FCE7F3" />
     </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="50%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#EC4899" />
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#CBD5E1" stroke-width="1" />
+    </pattern>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b" />
+      <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.45 0" result="g" />
+      <feMerge>
+        <feMergeNode in="g" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
   </defs>
-  <rect width="1200" height="340" fill="url(#bg)" />
-  <text x="60" y="55" fill="#0F172A" font-size="24" font-family="Space Grotesk, Helvetica, Arial, sans-serif">NTK-by-parts Zones</text>
-  <text x="60" y="86" fill="#475569" font-size="14" font-family="JetBrains Mono, 'Courier New', monospace">Fast clocks -> transition -> slow clocks</text>
 
-  <rect x="80" y="150" width="320" height="70" fill="#BAE6FD" stroke="#0F172A" />
-  <rect x="400" y="150" width="320" height="70" fill="#C4B5FD" stroke="#0F172A" />
-  <rect x="720" y="150" width="320" height="70" fill="#F9A8D4" stroke="#0F172A" />
+  <rect width="1200" height="420" fill="url(#bg)" />
+  <rect width="1200" height="420" fill="url(#grid)" opacity="0.22" />
 
-  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="13" fill="#0F172A">
-    <text x="165" y="190">Fast (r > beta)</text>
-    <text x="485" y="190">Blend (alpha <= r <= beta)</text>
-    <text x="820" y="190">Slow (r < alpha)</text>
+  <text x="60" y="64" fill="#0B1220" font-size="28" font-weight="800" font-family="Space Grotesk, Helvetica, Arial, sans-serif">NTK-by-parts Scaling Zones</text>
+  <text x="60" y="98" fill="#334155" font-size="14" font-family="JetBrains Mono, 'Courier New', monospace">Goal: extend context without destroying short-range phase structure.</text>
+
+  <rect x="60" y="120" width="1080" height="6" fill="url(#accent)" />
+
+  <g font-family="JetBrains Mono, 'Courier New', monospace" fill="#0B1220">
+    <text x="60" y="154" font-size="14" font-weight="700">Definitions</text>
+    <text x="60" y="176" font-size="13" fill="#334155">theta_i = b^(-2i/d)</text>
+    <text x="60" y="198" font-size="13" fill="#334155">r(i) = (L * theta_i) / (2pi)</text>
   </g>
 
-  <g stroke="#06B6D4" stroke-width="2">
-    <line x1="80" y1="235" x2="1040" y2="235" />
-    <circle cx="400" cy="235" r="6" fill="#06B6D4" />
-    <circle cx="720" cy="235" r="6" fill="#EC4899" />
+  <g>
+    <rect x="60" y="230" width="340" height="140" rx="14" fill="#FFFFFF" opacity="0.65" stroke="#0B1220" stroke-width="2" />
+    <rect x="60" y="230" width="340" height="6" rx="14" fill="#06B6D4" />
+    <text x="84" y="268" fill="#0B1220" font-size="16" font-weight="800" font-family="JetBrains Mono, 'Courier New', monospace">FAST</text>
+    <text x="84" y="292" fill="#334155" font-size="13" font-family="JetBrains Mono, 'Courier New', monospace">Condition: r(i) > beta</text>
+    <text x="84" y="316" fill="#0B1220" font-size="13" font-family="JetBrains Mono, 'Courier New', monospace">Action:</text>
+    <text x="84" y="338" fill="#334155" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">Preserve base inv_freq</text>
+    <text x="84" y="358" fill="#334155" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">Protect local detail</text>
   </g>
 
-  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="12" fill="#475569">
-    <text x="80" y="270">r(i) = L * theta_i / (2pi) with cutpoints alpha, beta</text>
-    <text x="80" y="292">fast: preserve base, slow: interpolate, mid: blend</text>
+  <g>
+    <rect x="430" y="230" width="340" height="140" rx="14" fill="#FFFFFF" opacity="0.65" stroke="#0B1220" stroke-width="2" />
+    <rect x="430" y="230" width="340" height="6" rx="14" fill="#8B5CF6" />
+    <text x="454" y="268" fill="#0B1220" font-size="16" font-weight="800" font-family="JetBrains Mono, 'Courier New', monospace">BLEND</text>
+    <text x="454" y="292" fill="#334155" font-size="13" font-family="JetBrains Mono, 'Courier New', monospace">alpha &lt;= r(i) &lt;= beta</text>
+    <text x="454" y="316" fill="#0B1220" font-size="13" font-family="JetBrains Mono, 'Courier New', monospace">Action:</text>
+    <text x="454" y="338" fill="#334155" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">Mix base + interp</text>
+    <text x="454" y="358" fill="#334155" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">Smooth transition</text>
   </g>
+
+  <g>
+    <rect x="800" y="230" width="340" height="140" rx="14" fill="#FFFFFF" opacity="0.65" stroke="#0B1220" stroke-width="2" />
+    <rect x="800" y="230" width="340" height="6" rx="14" fill="#EC4899" />
+    <text x="824" y="268" fill="#0B1220" font-size="16" font-weight="800" font-family="JetBrains Mono, 'Courier New', monospace">SLOW</text>
+    <text x="824" y="292" fill="#334155" font-size="13" font-family="JetBrains Mono, 'Courier New', monospace">Condition: r(i) &lt; alpha</text>
+    <text x="824" y="316" fill="#0B1220" font-size="13" font-family="JetBrains Mono, 'Courier New', monospace">Action:</text>
+    <text x="824" y="338" fill="#334155" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">Interpolate positions</text>
+    <text x="824" y="358" fill="#334155" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">Extend long range</text>
+  </g>
+
+  <rect x="80" y="388" width="200" height="6" fill="url(#accent)" filter="url(#glow)" opacity="0.8">
+    <animate attributeName="x" dur="5.2s" repeatCount="indefinite" values="80;920;80" keyTimes="0;0.5;1" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" />
+  </rect>
+
+  <text x="60" y="410" fill="#334155" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">Implementation note: keep ASCII labels for GitHub SVG reliability.</text>
 </svg>
