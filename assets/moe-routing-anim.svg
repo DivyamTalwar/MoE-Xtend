@@ -1,0 +1,87 @@
+<svg width="1200" height="360" viewBox="0 0 1200 360" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFC" />
+      <stop offset="45%" stop-color="#E0F2FE" />
+      <stop offset="100%" stop-color="#FCE7F3" />
+    </linearGradient>
+    <linearGradient id="route" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="50%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#EC4899" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="360" fill="url(#bg)" />
+  <text x="60" y="50" fill="#0F172A" font-size="22" font-family="Space Grotesk, Helvetica, Arial, sans-serif">MoE Routing Flow</text>
+  <text x="60" y="78" fill="#475569" font-size="13" font-family="JetBrains Mono, 'Courier New', monospace">Router scores experts, selects top-k, combines outputs via weighted sum.</text>
+
+  <g fill="none" stroke="#0F172A" stroke-width="1">
+    <rect x="70" y="110" width="140" height="50" />
+    <rect x="70" y="190" width="140" height="50" />
+    <rect x="70" y="270" width="140" height="50" />
+  </g>
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="12" fill="#0F172A">
+    <text x="90" y="140">Token 1</text>
+    <text x="90" y="220">Token 2</text>
+    <text x="90" y="300">Token 3</text>
+  </g>
+
+  <circle cx="140" cy="135" r="5" fill="#06B6D4">
+    <animate attributeName="r" values="4;7;4" dur="1.6s" repeatCount="indefinite" />
+  </circle>
+  <circle cx="140" cy="215" r="5" fill="#8B5CF6">
+    <animate attributeName="r" values="4;7;4" dur="1.6s" begin="0.3s" repeatCount="indefinite" />
+  </circle>
+  <circle cx="140" cy="295" r="5" fill="#EC4899">
+    <animate attributeName="r" values="4;7;4" dur="1.6s" begin="0.6s" repeatCount="indefinite" />
+  </circle>
+
+  <rect x="300" y="140" width="180" height="120" fill="none" stroke="url(#route)" stroke-width="2" />
+  <text x="325" y="180" fill="#0F172A" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">Router logits</text>
+  <text x="325" y="200" fill="#475569" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">top-k = 4</text>
+  <text x="325" y="220" fill="#475569" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">softmax weights</text>
+
+  <g stroke="#0F172A" stroke-width="1" fill="none">
+    <rect x="560" y="90" width="150" height="50" />
+    <rect x="560" y="150" width="150" height="50" />
+    <rect x="560" y="210" width="150" height="50" />
+    <rect x="560" y="270" width="150" height="50" />
+  </g>
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="12" fill="#0F172A">
+    <text x="585" y="120">Expert 01</text>
+    <text x="585" y="180">Expert 07</text>
+    <text x="585" y="240">Expert 12</text>
+    <text x="585" y="300">Expert 21</text>
+  </g>
+
+  <rect x="820" y="140" width="280" height="120" fill="none" stroke="url(#route)" stroke-width="2" />
+  <text x="850" y="185" fill="#0F172A" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">Output = Σ w_i * expert_i</text>
+  <text x="850" y="205" fill="#475569" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">w_i from router softmax</text>
+
+  <g stroke="url(#route)" stroke-width="2" fill="none" stroke-dasharray="6 6">
+    <path d="M210 135 C 250 135, 260 150, 300 175" />
+    <path d="M210 215 C 250 215, 260 200, 300 190" />
+    <path d="M210 295 C 250 295, 260 230, 300 205" />
+
+    <path d="M480 175 C 520 175, 530 110, 560 115" />
+    <path d="M480 185 C 520 185, 530 170, 560 175" />
+    <path d="M480 195 C 520 195, 530 230, 560 235" />
+
+    <path d="M710 115 C 760 120, 780 140, 820 170" />
+    <path d="M710 175 C 760 180, 780 170, 820 190" />
+    <path d="M710 235 C 760 230, 780 210, 820 210" />
+
+    <animate attributeName="stroke-dashoffset" values="0;28" dur="2.4s" repeatCount="indefinite" />
+  </g>
+
+  <circle r="6" fill="#22D3EE">
+    <animateMotion path="M210 135 C 250 135, 260 150, 300 175" dur="2.2s" repeatCount="indefinite" />
+  </circle>
+
+  <rect x="820" y="260" width="280" height="50" fill="none" stroke="#0F172A" stroke-width="1" />
+  <text x="840" y="290" fill="#475569" font-size="11" font-family="JetBrains Mono, 'Courier New', monospace">Sparse compute, dense capacity</text>
+
+  <rect x="60" y="110" width="1080" height="3" fill="url(#route)" opacity="0.2">
+    <animate attributeName="y" values="110;330;110" dur="5s" repeatCount="indefinite" />
+  </rect>
+</svg>

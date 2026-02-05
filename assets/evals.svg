@@ -1,0 +1,43 @@
+<svg width="1200" height="360" viewBox="0 0 1200 360" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFC" />
+      <stop offset="45%" stop-color="#E0F2FE" />
+      <stop offset="100%" stop-color="#FCE7F3" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="360" fill="url(#bg)" />
+  <text x="60" y="50" fill="#0F172A" font-size="22" font-family="Space Grotesk, Helvetica, Arial, sans-serif">Long-Context Evaluations</text>
+  <text x="60" y="78" fill="#475569" font-size="13" font-family="JetBrains Mono, 'Courier New', monospace">Needle-in-haystack · Passkey retrieval · TTFT/throughput</text>
+
+  <g stroke="#0F172A" stroke-width="1" fill="none">
+    <rect x="60" y="120" width="520" height="200" />
+    <rect x="620" y="120" width="520" height="200" />
+  </g>
+
+  <text x="90" y="150" fill="#0F172A" font-size="14" font-family="JetBrains Mono, 'Courier New', monospace">Needle-in-Haystack</text>
+  <text x="650" y="150" fill="#0F172A" font-size="14" font-family="JetBrains Mono, 'Courier New', monospace">Passkey Retrieval</text>
+
+  <g fill="#E2E8F0">
+    <rect x="90" y="170" width="450" height="20" />
+    <rect x="90" y="200" width="450" height="20" />
+    <rect x="90" y="230" width="450" height="20" />
+    <rect x="90" y="260" width="450" height="20" />
+  </g>
+  <rect x="250" y="230" width="40" height="20" fill="#06B6D4" />
+
+  <g fill="#E2E8F0">
+    <rect x="650" y="170" width="450" height="20" />
+    <rect x="650" y="200" width="450" height="20" />
+    <rect x="650" y="230" width="450" height="20" />
+    <rect x="650" y="260" width="450" height="20" />
+  </g>
+  <rect x="820" y="170" width="60" height="20" fill="#8B5CF6">
+    <animate attributeName="x" values="660;1020;660" dur="4s" repeatCount="indefinite" />
+  </rect>
+
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="11" fill="#475569">
+    <text x="90" y="300">metric: retrieval accuracy @ context length</text>
+    <text x="650" y="300">metric: exact passkey reproduction</text>
+  </g>
+</svg>

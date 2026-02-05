@@ -1,0 +1,77 @@
+<svg width="1200" height="420" viewBox="0 0 1200 420" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFC" />
+      <stop offset="45%" stop-color="#E0F2FE" />
+      <stop offset="100%" stop-color="#FCE7F3" />
+    </linearGradient>
+    <linearGradient id="stack" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="50%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="420" fill="url(#bg)" />
+  <text x="60" y="50" fill="#0F172A" font-size="22" font-family="Space Grotesk, Helvetica, Arial, sans-serif">Attention Stack</text>
+  <text x="60" y="78" fill="#475569" font-size="13" font-family="JetBrains Mono, 'Courier New', monospace">QKV projection → RoPE → GQA → Sliding Window → Sinks</text>
+
+  <g stroke="#0F172A" stroke-width="1" fill="none">
+    <rect x="60" y="120" width="180" height="60" />
+    <rect x="260" y="120" width="180" height="60" />
+    <rect x="460" y="120" width="180" height="60" />
+    <rect x="660" y="120" width="180" height="60" />
+    <rect x="860" y="120" width="180" height="60" />
+  </g>
+
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="12" fill="#0F172A">
+    <text x="115" y="155">QKV</text>
+    <text x="320" y="155">RoPE</text>
+    <text x="515" y="155">GQA</text>
+    <text x="695" y="155">Window</text>
+    <text x="905" y="155">Sinks</text>
+  </g>
+
+  <g stroke="url(#stack)" stroke-width="2">
+    <line x1="240" y1="150" x2="260" y2="150" />
+    <line x1="440" y1="150" x2="460" y2="150" />
+    <line x1="640" y1="150" x2="660" y2="150" />
+    <line x1="840" y1="150" x2="860" y2="150" />
+  </g>
+
+  <g>
+    <rect x="60" y="230" width="1080" height="150" fill="none" stroke="#0F172A" />
+    <rect x="60" y="230" width="1080" height="6" fill="url(#stack)" />
+    <text x="80" y="260" fill="#0F172A" font-size="14" font-family="JetBrains Mono, 'Courier New', monospace">Sliding Window Mask</text>
+
+    <g fill="#E2E8F0">
+      <rect x="110" y="285" width="40" height="40" />
+      <rect x="160" y="285" width="40" height="40" />
+      <rect x="210" y="285" width="40" height="40" />
+      <rect x="260" y="285" width="40" height="40" />
+      <rect x="310" y="285" width="40" height="40" />
+    </g>
+    <g fill="#22D3EE" opacity="0.75">
+      <rect x="210" y="335" width="40" height="40" />
+      <rect x="260" y="335" width="40" height="40" />
+      <rect x="310" y="335" width="40" height="40" />
+    </g>
+
+    <rect x="210" y="335" width="40" height="40" fill="#EC4899" opacity="0.4">
+      <animate attributeName="x" values="210;310;210" dur="2.2s" repeatCount="indefinite" />
+    </rect>
+
+    <g stroke="#0F172A" stroke-width="1" fill="none">
+      <rect x="110" y="285" width="240" height="90" />
+    </g>
+  </g>
+
+  <rect x="60" y="110" width="1080" height="3" fill="url(#stack)" opacity="0.2">
+    <animate attributeName="y" values="110;380;110" dur="5s" repeatCount="indefinite" />
+  </rect>
+
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="11" fill="#475569">
+    <text x="720" y="260">GQA reduces KV heads while preserving query capacity.</text>
+    <text x="720" y="278">Sinks introduce learnable bias to stabilize attention.</text>
+    <text x="720" y="296">Windowed layers cut memory without losing local context.</text>
+  </g>
+</svg>

@@ -1,0 +1,54 @@
+<svg width="1200" height="360" viewBox="0 0 1200 360" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFC" />
+      <stop offset="45%" stop-color="#E0F2FE" />
+      <stop offset="100%" stop-color="#FCE7F3" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="360" fill="url(#bg)" />
+  <text x="60" y="50" fill="#0F172A" font-size="22" font-family="Space Grotesk, Helvetica, Arial, sans-serif">RoPE Rotation Intuition</text>
+  <text x="60" y="78" fill="#475569" font-size="13" font-family="JetBrains Mono, 'Courier New', monospace">Each pair of dimensions rotates by a frequency-dependent angle.</text>
+
+  <g transform="translate(240,190)">
+    <circle cx="0" cy="0" r="90" fill="none" stroke="#0F172A" stroke-width="1" />
+    <circle cx="0" cy="0" r="60" fill="none" stroke="#CBD5E1" stroke-width="1" />
+    <line x1="0" y1="0" x2="90" y2="0" stroke="#06B6D4" stroke-width="3">
+      <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0" to="360" dur="6s" repeatCount="indefinite" />
+    </line>
+    <circle cx="90" cy="0" r="6" fill="#06B6D4">
+      <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0" to="360" dur="6s" repeatCount="indefinite" />
+    </circle>
+  </g>
+
+  <g transform="translate(520,190)">
+    <circle cx="0" cy="0" r="90" fill="none" stroke="#0F172A" stroke-width="1" />
+    <line x1="0" y1="0" x2="90" y2="0" stroke="#8B5CF6" stroke-width="3">
+      <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0" to="360" dur="10s" repeatCount="indefinite" />
+    </line>
+    <circle cx="90" cy="0" r="6" fill="#8B5CF6">
+      <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0" to="360" dur="10s" repeatCount="indefinite" />
+    </circle>
+  </g>
+
+  <g transform="translate(800,190)">
+    <circle cx="0" cy="0" r="90" fill="none" stroke="#0F172A" stroke-width="1" />
+    <line x1="0" y1="0" x2="90" y2="0" stroke="#EC4899" stroke-width="3">
+      <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0" to="360" dur="14s" repeatCount="indefinite" />
+    </line>
+    <circle cx="90" cy="0" r="6" fill="#EC4899">
+      <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0" to="360" dur="14s" repeatCount="indefinite" />
+    </circle>
+  </g>
+
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="12" fill="#475569">
+    <text x="100" y="330">fast clocks capture local structure</text>
+    <text x="440" y="330">mid clocks blend local + global</text>
+    <text x="770" y="330">slow clocks preserve long-range</text>
+  </g>
+
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="12" fill="#0F172A">
+    <text x="60" y="110">theta_i = b^(-2i/d)</text>
+    <text x="60" y="130">lambda_i = 2pi / theta_i</text>
+  </g>
+</svg>

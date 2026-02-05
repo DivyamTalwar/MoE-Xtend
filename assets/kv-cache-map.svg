@@ -1,0 +1,36 @@
+<svg width="1200" height="360" viewBox="0 0 1200 360" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFC" />
+      <stop offset="45%" stop-color="#E0F2FE" />
+      <stop offset="100%" stop-color="#FCE7F3" />
+    </linearGradient>
+    <linearGradient id="kv" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="50%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#EC4899" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="360" fill="url(#bg)" />
+  <text x="60" y="50" fill="#0F172A" font-size="22" font-family="Space Grotesk, Helvetica, Arial, sans-serif">KV Cache Memory Map</text>
+  <text x="60" y="78" fill="#475569" font-size="13" font-family="JetBrains Mono, 'Courier New', monospace">Cache layout = [batch, ctx, kv_heads, head_dim]</text>
+
+  <rect x="60" y="110" width="1080" height="180" fill="none" stroke="#0F172A" />
+  <rect x="60" y="110" width="1080" height="6" fill="url(#kv)" />
+
+  <rect x="90" y="150" width="820" height="40" fill="#BAE6FD" stroke="#0F172A" />
+  <rect x="910" y="150" width="200" height="40" fill="#FBCFE8" stroke="#0F172A" />
+  <text x="100" y="175" fill="#0F172A" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">prefix / prompt tokens</text>
+  <text x="920" y="175" fill="#0F172A" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">decode region</text>
+
+  <rect x="90" y="210" width="1020" height="40" fill="none" stroke="#0F172A" />
+  <rect x="90" y="210" width="50" height="40" fill="url(#kv)">
+    <animate attributeName="x" values="90;1060;90" dur="5s" repeatCount="indefinite" />
+  </rect>
+  <text x="100" y="235" fill="#0F172A" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">write head (offset)</text>
+
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="11" fill="#475569">
+    <text x="60" y="310">KV cache grows monotonically during decode; offset advances by 1 per token.</text>
+    <text x="60" y="328">RoPE index uses absolute position = offset + local_index.</text>
+  </g>
+</svg>

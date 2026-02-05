@@ -1,0 +1,61 @@
+<svg width="1200" height="380" viewBox="0 0 1200 380" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFC" />
+      <stop offset="45%" stop-color="#E0F2FE" />
+      <stop offset="100%" stop-color="#FCE7F3" />
+    </linearGradient>
+    <linearGradient id="gqa" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="50%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#EC4899" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="380" fill="url(#bg)" />
+  <text x="60" y="50" fill="#0F172A" font-size="22" font-family="Space Grotesk, Helvetica, Arial, sans-serif">GQA Head Grouping</text>
+  <text x="60" y="78" fill="#475569" font-size="13" font-family="JetBrains Mono, 'Courier New', monospace">Query heads are grouped to share KV heads.</text>
+
+  <rect x="60" y="110" width="1080" height="210" fill="none" stroke="#0F172A" />
+  <rect x="60" y="110" width="1080" height="6" fill="url(#gqa)" />
+
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="12" fill="#0F172A">
+    <text x="90" y="145">Q heads</text>
+    <text x="620" y="145">KV heads</text>
+  </g>
+
+  <g fill="#E2E8F0" stroke="#0F172A">
+    <rect x="90" y="170" width="40" height="30" />
+    <rect x="140" y="170" width="40" height="30" />
+    <rect x="190" y="170" width="40" height="30" />
+    <rect x="240" y="170" width="40" height="30" />
+
+    <rect x="90" y="210" width="40" height="30" />
+    <rect x="140" y="210" width="40" height="30" />
+    <rect x="190" y="210" width="40" height="30" />
+    <rect x="240" y="210" width="40" height="30" />
+
+    <rect x="90" y="250" width="40" height="30" />
+    <rect x="140" y="250" width="40" height="30" />
+    <rect x="190" y="250" width="40" height="30" />
+    <rect x="240" y="250" width="40" height="30" />
+  </g>
+
+  <g fill="#C4B5FD" stroke="#0F172A">
+    <rect x="620" y="190" width="80" height="40" />
+    <rect x="720" y="190" width="80" height="40" />
+  </g>
+
+  <g stroke="url(#gqa)" stroke-width="2" fill="none">
+    <path d="M130 185 C 260 185, 420 195, 620 210" />
+    <path d="M230 185 C 360 185, 500 210, 700 210" />
+    <path d="M130 225 C 260 225, 420 210, 620 210" />
+    <path d="M230 225 C 360 225, 500 210, 700 210" />
+    <path d="M130 265 C 260 265, 420 210, 620 210" />
+    <path d="M230 265 C 360 265, 500 210, 700 210" />
+  </g>
+
+  <rect x="820" y="170" width="300" height="120" fill="none" stroke="#0F172A" />
+  <text x="840" y="200" fill="#0F172A" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">group_factor = n_q / n_kv</text>
+  <text x="840" y="220" fill="#475569" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">each KV head serves multiple Q heads</text>
+  <text x="840" y="240" fill="#475569" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">saves memory + bandwidth</text>
+</svg>

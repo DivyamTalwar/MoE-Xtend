@@ -1,0 +1,42 @@
+<svg width="1200" height="360" viewBox="0 0 1200 360" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFC" />
+      <stop offset="45%" stop-color="#E0F2FE" />
+      <stop offset="100%" stop-color="#FCE7F3" />
+    </linearGradient>
+    <linearGradient id="kv" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="50%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#EC4899" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="360" fill="url(#bg)" />
+  <text x="60" y="50" fill="#0F172A" font-size="22" font-family="Space Grotesk, Helvetica, Arial, sans-serif">KV Cache Timeline</text>
+  <text x="60" y="78" fill="#475569" font-size="13" font-family="JetBrains Mono, 'Courier New', monospace">Prefill populates cache once. Decode appends one token per step.</text>
+
+  <g fill="none" stroke="#0F172A" stroke-width="1">
+    <rect x="80" y="140" width="980" height="60" />
+    <rect x="80" y="230" width="980" height="60" />
+  </g>
+
+  <g fill="url(#kv)" opacity="0.7">
+    <rect x="90" y="150" width="420" height="40" />
+    <rect x="90" y="240" width="60" height="40" />
+  </g>
+
+  <g fill="#0F172A" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">
+    <text x="90" y="130">Prefill</text>
+    <text x="90" y="220">Decode</text>
+    <text x="520" y="130">Stores K/V for prompt tokens</text>
+    <text x="520" y="220">Append one token at a time</text>
+  </g>
+
+  <rect x="150" y="240" width="20" height="40" fill="#22D3EE">
+    <animate attributeName="x" values="150;1010;150" dur="4.2s" repeatCount="indefinite" />
+  </rect>
+
+  <rect x="80" y="110" width="980" height="3" fill="url(#kv)" opacity="0.25">
+    <animate attributeName="y" values="110;300;110" dur="4.6s" repeatCount="indefinite" />
+  </rect>
+</svg>

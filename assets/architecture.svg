@@ -1,0 +1,69 @@
+<svg width="1200" height="520" viewBox="0 0 1200 520" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFC" />
+      <stop offset="45%" stop-color="#E0F2FE" />
+      <stop offset="100%" stop-color="#FCE7F3" />
+    </linearGradient>
+    <linearGradient id="arch" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="50%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#EC4899" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="520" fill="url(#bg)" />
+  <text x="60" y="60" fill="#0F172A" font-size="26" font-family="Space Grotesk, Helvetica, Arial, sans-serif">Architecture Overview</text>
+  <text x="60" y="90" fill="#475569" font-size="14" font-family="JetBrains Mono, 'Courier New', monospace">Harmony-native pipeline with MoE routing and long-context scaling.</text>
+
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="13" fill="#0F172A" stroke="#0F172A" stroke-width="1">
+    <rect x="60" y="140" width="170" height="70" fill="none" />
+    <text x="90" y="180">Input Tokens</text>
+
+    <rect x="250" y="140" width="170" height="70" fill="none" />
+    <text x="300" y="180">Embedding</text>
+
+    <rect x="440" y="130" width="230" height="90" fill="none" stroke="url(#arch)" stroke-width="2">
+      <animate attributeName="stroke-opacity" values="0.4;1;0.4" dur="2.6s" repeatCount="indefinite" />
+    </rect>
+    <text x="480" y="175">Attention Block</text>
+    <text x="470" y="195" fill="#475569">RoPE · GQA · Sinks</text>
+
+    <rect x="690" y="130" width="230" height="90" fill="none" stroke="url(#arch)" stroke-width="2">
+      <animate attributeName="stroke-opacity" values="1;0.4;1" dur="2.6s" repeatCount="indefinite" />
+    </rect>
+    <text x="740" y="175">MoE Block</text>
+    <text x="705" y="195" fill="#475569">Top-k · SwiGLU · Router</text>
+
+    <rect x="940" y="140" width="170" height="70" fill="none" />
+    <text x="985" y="180">Logits</text>
+
+    <line x1="230" y1="175" x2="250" y2="175" />
+    <line x1="420" y1="175" x2="440" y2="175" />
+    <line x1="670" y1="175" x2="690" y2="175" />
+    <line x1="920" y1="175" x2="940" y2="175" />
+  </g>
+
+  <circle r="5" fill="#06B6D4">
+    <animateMotion path="M230 175 L 940 175" dur="3.2s" repeatCount="indefinite" />
+  </circle>
+
+  <rect x="60" y="110" width="1080" height="4" fill="url(#arch)" opacity="0.25">
+    <animate attributeName="y" values="110;480;110" dur="6s" repeatCount="indefinite" />
+  </rect>
+
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="12" fill="#475569">
+    <text x="60" y="260">Layer pattern: [Attention -> MoE] x N</text>
+    <text x="60" y="282">Sliding-window alternates with full-context layers for stability.</text>
+    <text x="60" y="304">KV cache preserves decode latency for long generations.</text>
+    <text x="60" y="326">Harmony framing keeps tool use and structured outputs stable.</text>
+  </g>
+
+  <g>
+    <rect x="60" y="350" width="1080" height="140" fill="none" stroke="#0F172A" stroke-width="1" />
+    <rect x="60" y="350" width="1080" height="6" fill="url(#arch)" />
+    <text x="80" y="380" fill="#0F172A" font-size="14" font-family="JetBrains Mono, 'Courier New', monospace">System Contracts</text>
+    <text x="80" y="404" fill="#475569" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">Harmony format · Structured outputs · Deterministic sampling controls</text>
+    <text x="80" y="428" fill="#475569" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">Eval harness: needle, passkey, throughput, TTFT</text>
+    <text x="80" y="452" fill="#475569" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">Server mode: /v1/responses compatible local endpoint</text>
+  </g>
+</svg>

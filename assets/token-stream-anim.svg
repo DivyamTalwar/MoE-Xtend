@@ -1,0 +1,43 @@
+<svg width="1200" height="320" viewBox="0 0 1200 320" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFC" />
+      <stop offset="45%" stop-color="#E0F2FE" />
+      <stop offset="100%" stop-color="#FCE7F3" />
+    </linearGradient>
+    <linearGradient id="flow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="50%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#EC4899" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="320" fill="url(#bg)" />
+  <text x="60" y="50" fill="#0F172A" font-size="22" font-family="Space Grotesk, Helvetica, Arial, sans-serif">Token Stream (Decode)</text>
+  <text x="60" y="78" fill="#475569" font-size="13" font-family="JetBrains Mono, 'Courier New', monospace">Single-token loop with cached keys/values and spectral flow.</text>
+
+  <rect x="80" y="120" width="1040" height="120" fill="none" stroke="#0F172A" />
+
+  <path id="wave" d="M120 180 C 280 120, 520 120, 680 180 S 1040 240, 1080 180" fill="none" stroke="url(#flow)" stroke-width="3" />
+
+  <circle r="6" fill="#06B6D4">
+    <animateMotion path="M120 180 C 280 120, 520 120, 680 180 S 1040 240, 1080 180" dur="3s" repeatCount="indefinite" />
+  </circle>
+  <circle r="6" fill="#EC4899">
+    <animateMotion path="M120 180 C 280 120, 520 120, 680 180 S 1040 240, 1080 180" dur="3s" begin="1s" repeatCount="indefinite" />
+  </circle>
+
+  <g>
+    <path d="M120 210 C 260 260, 520 260, 680 210 S 1040 140, 1080 210" fill="none" stroke="#22D3EE" stroke-width="2" opacity="0.6">
+      <animate attributeName="stroke-dasharray" values="2 10;6 10;2 10" dur="2.4s" repeatCount="indefinite" />
+    </path>
+  </g>
+
+  <rect x="80" y="120" width="1040" height="4" fill="url(#flow)" opacity="0.2">
+    <animate attributeName="y" values="120;236;120" dur="4s" repeatCount="indefinite" />
+  </rect>
+
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="11" fill="#475569">
+    <text x="100" y="260">loop: next_token = sample(logits); append KV; repeat</text>
+    <text x="100" y="280">decode cost scales with active experts + attention window</text>
+  </g>
+</svg>
