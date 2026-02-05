@@ -1,0 +1,151 @@
+<svg width="1200" height="560" viewBox="0 0 1200 560" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFC" />
+      <stop offset="45%" stop-color="#E0F2FE" />
+      <stop offset="100%" stop-color="#FCE7F3" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="50%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#EC4899" />
+    </linearGradient>
+    <linearGradient id="scan" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0" />
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.38" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#CBD5E1" stroke-width="1" />
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#0B1220" flood-opacity="0.14" />
+    </filter>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="b" />
+      <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.65 0" result="g" />
+      <feMerge>
+        <feMergeNode in="g" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="560" fill="url(#bg)" />
+  <rect width="1200" height="560" fill="url(#grid)" opacity="0.25" />
+
+  <text x="60" y="70" fill="#0B1220" font-size="34" font-weight="800" font-family="Space Grotesk, Helvetica, Arial, sans-serif">MoE-Xtend: Responses Stack (Local API -&gt; Generator)</text>
+  <text x="60" y="104" fill="#334155" font-size="14" font-family="JetBrains Mono, 'Courier New', monospace">Request in. Harmony prompt rendered. Prefill + decode on KV cache. Response out with metrics.</text>
+  <rect x="60" y="124" width="1080" height="6" fill="url(#accent)" />
+
+  <!-- main card -->
+  <g filter="url(#shadow)">
+    <rect x="60" y="150" width="1080" height="360" rx="22" fill="#FFFFFF" opacity="0.66" stroke="#0B1220" stroke-width="2" />
+  </g>
+
+  <!-- request card -->
+  <g filter="url(#shadow)">
+    <rect x="92" y="188" width="320" height="150" rx="18" fill="#FFFFFF" opacity="0.72" stroke="#0B1220" stroke-width="2" />
+  </g>
+  <rect x="92" y="188" width="320" height="6" rx="18" fill="url(#accent)" opacity="0.92" />
+
+  <g font-family="JetBrains Mono, 'Courier New', monospace">
+    <text x="114" y="220" font-size="14" font-weight="800" fill="#0B1220">HTTP Request</text>
+    <text x="114" y="242" font-size="12" fill="#334155">POST /v1/responses</text>
+    <text x="114" y="270" font-size="11" fill="#334155">{"messages":[...],"max_output_tokens":200}</text>
+    <text x="114" y="290" font-size="11" fill="#334155">{"temperature":0.2,"top_p":0.95,"min_p":0.05}</text>
+    <text x="114" y="314" font-size="11" fill="#334155">optional: logit_bias, stop, penalties</text>
+  </g>
+
+  <!-- response card -->
+  <g filter="url(#shadow)">
+    <rect x="820" y="188" width="320" height="150" rx="18" fill="#FFFFFF" opacity="0.72" stroke="#0B1220" stroke-width="2" />
+  </g>
+  <rect x="820" y="188" width="320" height="6" rx="18" fill="url(#accent)" opacity="0.92" />
+
+  <g font-family="JetBrains Mono, 'Courier New', monospace">
+    <text x="842" y="220" font-size="14" font-weight="800" fill="#0B1220">HTTP Response</text>
+    <text x="842" y="242" font-size="12" fill="#334155">{"output_text":"..."}</text>
+    <text x="842" y="270" font-size="11" fill="#334155">{"metrics":{"prefill_ms":..,"decode_ms":..}}</text>
+    <text x="842" y="290" font-size="11" fill="#334155">{"tokens_generated": N}</text>
+    <text x="842" y="314" font-size="11" fill="#334155">analysis: logprobs/jsonl outputs</text>
+  </g>
+
+  <!-- center pipeline card -->
+  <g filter="url(#shadow)">
+    <rect x="432" y="188" width="368" height="300" rx="18" fill="#FFFFFF" opacity="0.72" stroke="#0B1220" stroke-width="2" />
+  </g>
+  <rect x="432" y="188" width="368" height="6" rx="18" fill="url(#accent)" opacity="0.92" />
+
+  <g font-family="JetBrains Mono, 'Courier New', monospace" fill="#0B1220">
+    <text x="454" y="220" font-size="14" font-weight="800">Server -&gt; Generator</text>
+    <text x="454" y="242" font-size="12" fill="#334155">render Harmony, prefill KV, decode loop</text>
+  </g>
+
+  <!-- sub blocks inside center -->
+  <g font-family="JetBrains Mono, 'Courier New', monospace" fill="#0B1220">
+    <rect x="454" y="258" width="324" height="56" rx="14" fill="#FFFFFF" opacity="0.86" stroke="#0B1220" stroke-width="2" />
+    <text x="474" y="286" font-size="12" font-weight="800">Harmony Render</text>
+    <text x="474" y="306" font-size="11" fill="#334155">messages -&gt; tokenizable spec</text>
+
+    <rect x="454" y="324" width="324" height="74" rx="14" fill="#FFFFFF" opacity="0.86" stroke="url(#accent)" stroke-width="3" />
+    <text x="474" y="352" font-size="12" font-weight="800">Prefill (KV build)</text>
+    <text x="474" y="372" font-size="11" fill="#334155">writes K,V for prompt tokens</text>
+
+    <rect x="454" y="406" width="324" height="70" rx="14" fill="#FFFFFF" opacity="0.86" stroke="#0B1220" stroke-width="2" />
+    <text x="474" y="434" font-size="12" font-weight="800">Decode Loop</text>
+    <text x="474" y="454" font-size="11" fill="#334155">attn + MoE + sample + append KV</text>
+  </g>
+
+  <!-- connectors request -> center -> response -->
+  <g stroke="url(#accent)" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.92">
+    <path id="req" d="M412 262 C 428 262, 432 262, 432 262" />
+    <path id="resp" d="M800 262 C 816 262, 820 262, 820 262" />
+  </g>
+
+  <g filter="url(#glow)">
+    <circle r="7" fill="#06B6D4"><animateMotion path="M412 262 C 428 262, 432 262, 432 262" dur="1.0s" repeatCount="indefinite" /></circle>
+    <circle r="7" fill="#EC4899"><animateMotion path="M800 262 C 816 262, 820 262, 820 262" dur="1.0s" begin="0.4s" repeatCount="indefinite" /></circle>
+  </g>
+
+  <!-- decode loop mini wave (motion) -->
+  <path d="M470 470 C 520 438, 580 438, 630 470 S 710 502, 760 470" fill="none" stroke="url(#accent)" stroke-width="3" filter="url(#glow)" opacity="0.9" />
+  <circle r="6" fill="#0B1220" opacity="0.75">
+    <animateMotion path="M470 470 C 520 438, 580 438, 630 470 S 710 502, 760 470" dur="2.4s" repeatCount="indefinite" />
+  </circle>
+
+  <!-- metrics strip -->
+  <g filter="url(#shadow)">
+    <rect x="92" y="358" width="1048" height="130" rx="18" fill="#FFFFFF" opacity="0.72" stroke="#0B1220" stroke-width="2" />
+  </g>
+  <rect x="92" y="358" width="1048" height="6" rx="18" fill="url(#accent)" opacity="0.92" />
+
+  <g font-family="JetBrains Mono, 'Courier New', monospace" fill="#0B1220">
+    <text x="114" y="392" font-size="14" font-weight="800">Metrics (for regression + profiling)</text>
+    <g font-size="12" fill="#334155">
+      <text x="114" y="418">TTFT (prefill_ms) + steady-state (decode_ms / token) + tokens_generated</text>
+      <text x="114" y="440">logprobs + JSONL outputs enable reproducible diffs across commits/configs</text>
+    </g>
+  </g>
+
+  <g filter="url(#glow)">
+    <rect x="114" y="454" width="360" height="10" rx="5" fill="#E2E8F0" />
+    <rect x="114" y="454" width="220" height="10" rx="5" fill="url(#accent)" opacity="0.75">
+      <animate attributeName="width" values="120;330;180;290;120" dur="4.8s" repeatCount="indefinite" />
+    </rect>
+    <text x="488" y="463" font-family="JetBrains Mono, 'Courier New', monospace" font-size="11" fill="#334155">prefill_ms</text>
+
+    <rect x="620" y="454" width="360" height="10" rx="5" fill="#E2E8F0" />
+    <rect x="620" y="454" width="160" height="10" rx="5" fill="url(#accent)" opacity="0.75">
+      <animate attributeName="width" values="90;300;140;240;90" dur="4.8s" begin="0.4s" repeatCount="indefinite" />
+    </rect>
+    <text x="994" y="463" font-family="JetBrains Mono, 'Courier New', monospace" font-size="11" fill="#334155">decode_ms/token</text>
+  </g>
+
+  <!-- scanline -->
+  <rect x="60" y="150" width="1080" height="42" fill="url(#scan)" opacity="0.22">
+    <animate attributeName="y" dur="7.2s" repeatCount="indefinite" values="150;468;150" keyTimes="0;0.5;1" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" />
+  </rect>
+
+  <text x="60" y="548" fill="#334155" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">Option 05: local Responses API stack (request -&gt; server -&gt; generator -&gt; response + metrics).</text>
+</svg>

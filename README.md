@@ -23,6 +23,7 @@
 <h2 align="center">CONTENTS</h2>
 
 - [Overview](#overview)
+- [Design Contracts](#design-contracts)
 - [Quick Start](#quick-start)
 - [CLI Examples](#cli-examples)
 - [Responses API (Local)](#responses-api-local)
@@ -52,6 +53,47 @@ MoE-Xtend is a **long-context MoE transformer system spec** with a heavy emphasi
 - **Transparent inference** via deterministic sampling controls, logprobs, and regression-minded metrics.
 - **Readable math**: every major component is paired with formulas and diagrams.
 
+<div align="center">
+  <img src="./assets/overview-options/overview-architecture-01-blueprint.svg" width="100%" alt="MoE-Xtend Overview Blueprint"/>
+</div>
+
+<details>
+  <summary><strong>Alternate overview hero variants</strong></summary>
+  <br/>
+  <img src="./assets/overview-options/overview-architecture-02-router-galaxy.svg" width="100%" alt="Overview Variant: Router Galaxy"/>
+  <img src="./assets/overview-options/overview-architecture-03-context-highway.svg" width="100%" alt="Overview Variant: Context Highway"/>
+  <img src="./assets/overview-options/overview-architecture-04-layer-ladder.svg" width="100%" alt="Overview Variant: Layer Ladder"/>
+  <img src="./assets/overview-options/overview-architecture-05-responses-stack.svg" width="100%" alt="Overview Variant: Responses Stack"/>
+</details>
+
+**How to read the blueprint**
+
+1. **Harmony prompt**: structured messages render into a deterministic token stream.
+2. **Tokenizer + masks**: ids, attention masks, and absolute positions are built once per request.
+3. **Transformer stack**: alternating full/banded attention blocks and sparse MoE blocks.
+4. **KV cache discipline**: prefill writes a prefix once; decode appends one row per token.
+5. **Sampling + stop logic**: logits -> truncation -> multinomial/greedy -> termination.
+6. **Structured outputs**: optional JSON extraction + schema checks for regression loops.
+
+**One-page pseudocode (prefill + decode)**
+
+```text
+# Prefill: build cache from prompt tokens once
+tokens = tokenize(prompt)
+cache = init_cache(L, B, cache_size=min(len(tokens) + max_tokens, max_context))
+X = embed(tokens)
+for l in 0..L-1:
+  X = Block[l].forward(X, cache[l])  # writes K/V and advances cache[l].offset
+
+# Decode: append one token per step (absolute position = cache.offset)
+for step in 0..max_tokens-1:
+  x = X[:, -1:]                      # last token only
+  for l in 0..L-1:
+    x = Block[l].forward(x, cache[l])  # appends 1 KV row per layer
+  next = sample(x)
+  X = concat(X, embed(next))
+```
+
 **What you can do with this repo**
 
 - Run Harmony-native inference with strict sampling controls and measurable metrics (`inference.py`).
@@ -65,6 +107,25 @@ The repo includes:
 - `inference.py`: Harmony-native inference + sampling + metrics/logprobs
 - `server.py`: local Responses-style HTTP server
 - `evals/`: retrieval + long-context sanity checks
+
+---
+
+<h2 id="design-contracts" align="center">DESIGN CONTRACTS</h2>
+
+If you change anything in the stack, keep these invariants intact or you will get silent long-context failures:
+
+- **Absolute position monotonicity**: RoPE positions use the global index `t = cache.offset + local_t` (never reset per window).
+- **Mask alignment**: causal/window masks must be built against `n_ctx = cache.K.shape[1]` with the same `offset` used for RoPE.
+- **KV cache append-only**: decode adds exactly one row per layer per step; `offset` increments once per append.
+- **GQA shape contract**: `H_q = H_kv * groups` and `head_dim` must match the checkpoint; don't "fix" mismatches downstream.
+- **MoE routing determinism**: `topk` ties, dtype, and device kernels can change expert selection. For regression: log routing ids.
+- **Sampling determinism**: seed + truncation params + penalties define behavior. If you change them, treat it as a new experiment.
+
+Where this is enforced in code:
+
+- `model.py`: `AttentionBlock.sdpa` (mask alignment + sinks), `RotaryEmbedding.forward` (absolute positions), `Cache.extend` (append-only)
+- `model.py`: `MLPBlock.forward` (router logits + top-k expert execution)
+- `sampling.py`: truncation + penalties + multinomial
 
 ---
 
@@ -293,11 +354,40 @@ $$I = \mathrm{topk}(s, k)$$
 $$w = \mathrm{softmax}(s[I])$$
 $$y = \sum_{i \in I} w_i \cdot E_i(x_t)$$
 
+**Dispatch + combine (batched view)**
+
+For a batch with `N = B*T` token states and `E` experts:
+
+```text
+S = X @ W_r^T                 # [N, E] router logits
+I = topk(S, k)                # [N, k] expert ids per token
+w = softmax(gather(S, I))     # [N, k] normalized weights
+
+# Dispatch: group token indices by expert id
+for e in 0..E-1:
+  idx = {t | e in I[t, :]}    # token rows routed to expert e
+  y[idx] += w[idx, slot] * Expert_e(X[idx])
+```
+
+In training systems you often enforce a **capacity** per expert to avoid overflow:
+
+$$C \approx \left\lceil \mathrm{capacity\_factor} \cdot \frac{N \cdot k}{E} \right\rceil$$
+
+This repo does **not** implement capacity or expert-parallel all-to-all. It is clarity-first and single-device.
+
 **Why routing is hard in practice**
 
 - **Collapse**: without balancing pressure, most tokens pick the same experts.
 - **Overflow**: with capacity constraints, many tokens may want the same expert at the same time.
 - **Non-determinism**: floating-point ties in `topk` can cause unstable outputs unless tie-breaks are consistent.
+
+**Optional (training) stabilization terms**
+
+If you train MoE models, you typically add auxiliary losses to keep routing healthy:
+
+- **Load/importance balancing** (discourages collapse).
+- **Router z-loss** (discourages extreme logits).
+- **Entropy regularization** (keeps routing distribution from becoming degenerate early).
 
 **Pseudocode (routing)**
 
@@ -337,6 +427,34 @@ Where `B` decomposes into additive bias terms:
 - Causal mask
 - Sliding window mask (for windowed layers)
 - Sink bias (to stabilize long decode)
+
+**Mask engineering (prefill vs decode, aligned to KV cache)**
+
+Let `offset` be the number of cached prefix tokens (0 for prefill, >0 for decode). For a query row `q` in the current chunk and a key index `k` in the cache:
+
+$$\mathrm{causal}(q,k) =
+\\begin{cases}
+0 & k \\le (\\mathrm{offset} + q) \\\\
+-\\infty & \\text{otherwise}
+\\end{cases}$$
+
+Sliding window (banded) attention of width `W` adds a lower bound:
+
+$$\mathrm{window}(q,k) =
+\\begin{cases}
+0 & k \\ge (\\mathrm{offset} + q - W) \\\\
+-\\infty & \\text{otherwise}
+\\end{cases}$$
+
+When these two masks are wrong by even one index, long-context behavior becomes chaotic (the model either "sees the future" or loses its anchor).
+
+**Sink bias (what this repo implements)**
+
+This implementation appends a **learnable sink logit** per head as an extra softmax column, then drops that column after normalization:
+
+$$W = \\mathrm{softmax}([QK + B,\\; S])$$
+
+Dropping `W_{sink}` leaves a "leaky" normalization that can damp attention mass in a head-specific way without changing the KV cache layout.
 
 **Pseudocode (attention + GQA, schematic)**
 
@@ -384,6 +502,30 @@ Interpretation:
 - Slow clocks preserve long-range structure.
 - Mid-band blends regimes to avoid phase discontinuities.
 
+**Pseudocode (YaRN + NTK-by-parts, matches this repo)**
+
+In `model.py`, the rotary coefficients are built from "inverse frequencies" `inv_freqs[i]` plus a YaRN concentration term:
+
+```text
+freqs[i] = base^(i / (d/2))          # geometric progression (per pair index)
+extrapolation = 1 / freqs            # original RoPE
+interpolation = 1 / (s * freqs)      # position interpolation (context stretch by s)
+
+concentration = 0.1 * log(s) + 1.0   # YaRN temperature softening
+
+# Cutpoints in index-space (i_beta < i_alpha):
+i_beta  = (d/2) * log(L_train / (beta * 2pi))  / log(base)
+i_alpha = (d/2) * log(L_train / (alpha * 2pi)) / log(base)
+
+ramp = (arange(d/2) - i_beta) / (i_alpha - i_beta)
+mask = 1 - clamp(ramp, 0, 1)         # 1 in FAST region, 0 in SLOW region
+
+inv_freqs = interpolation * (1 - mask) + extrapolation * mask
+cos/sin = cos(t * inv_freqs) * concentration, sin(t * inv_freqs) * concentration
+```
+
+This produces 3 regimes: fast clocks stay unchanged, slow clocks are stretched, and the middle band blends smoothly.
+
 **Implementation notes (this repo)**
 
 - `model.py`: `RotaryEmbedding` precomputes `cos/sin` up to `max_content_length` and indexes with `(arange(seq_len) + offset) % max_content_length`.
@@ -402,15 +544,21 @@ Interpretation:
 
 A useful back-of-the-envelope estimator:
 
-$$\text{bytes} \approx 2 \cdot L \cdot B \cdot T \cdot H_{kv} \cdot d \cdot \text{dtype\_size}$$
+$$\mathrm{bytes} \approx 2 \cdot L \cdot B \cdot T \cdot H_{kv} \cdot d \cdot \mathrm{dtype\_bytes}$$
 
 - The factor `2` is for `K` and `V`.
 - GQA reduces `H_kv`.
 - Long contexts make `T` the dominant term.
+- `dtype_bytes` is bytes per element (2 for bf16/fp16, 4 for fp32).
+
+Example (bf16 KV, `dtype_bytes=2`):
+
+$$\\mathrm{bytes} \\approx 2 \\cdot 24 \\cdot 1 \\cdot 131072 \\cdot 8 \\cdot 64 \\cdot 2 \\approx 6.0\\,\\mathrm{GiB}$$
 
 **Implementation notes (this repo)**
 
 - `model.py`: `Cache.extend` writes new K/V into preallocated tensors at indices `[offset:offset+t]`, then increments `offset`.
+- `model.py`: `Cache.snapshot()` / `Cache.restore()` enable "prefill once, decode many" research loops.
 - `inference.py`: caches are allocated per layer sized to `min(len(prompt)+max_tokens, max_context)`.
 - If you see shape mismatches or attention weirdness, check: KV head count (`H_kv`), `head_dim`, and the cache `offset`.
 

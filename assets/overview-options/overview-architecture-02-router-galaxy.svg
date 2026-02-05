@@ -1,0 +1,179 @@
+<svg width="1200" height="560" viewBox="0 0 1200 560" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFC" />
+      <stop offset="45%" stop-color="#E0F2FE" />
+      <stop offset="100%" stop-color="#FCE7F3" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="50%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#EC4899" />
+    </linearGradient>
+    <linearGradient id="accent2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#22D3EE" stop-opacity="0.0" />
+      <stop offset="50%" stop-color="#22D3EE" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#22D3EE" stop-opacity="0.0" />
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#CBD5E1" stroke-width="1" />
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#0B1220" flood-opacity="0.14" />
+    </filter>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b" />
+      <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.70 0" result="g" />
+      <feMerge>
+        <feMergeNode in="g" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <radialGradient id="core" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#EC4899" stop-opacity="0.32" />
+      <stop offset="55%" stop-color="#8B5CF6" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="#06B6D4" stop-opacity="0.0" />
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="560" fill="url(#bg)" />
+  <rect width="1200" height="560" fill="url(#grid)" opacity="0.25" />
+
+  <text x="60" y="70" fill="#0B1220" font-size="34" font-weight="800" font-family="Space Grotesk, Helvetica, Arial, sans-serif">MoE-Xtend: Router Galaxy (Expert Top-k)</text>
+  <text x="60" y="104" fill="#334155" font-size="14" font-family="JetBrains Mono, 'Courier New', monospace">Central router scores experts. A rotating pulse shows token-time drift of activated experts and the merge step.</text>
+  <rect x="60" y="124" width="1080" height="6" fill="url(#accent)" />
+
+  <!-- main card -->
+  <g filter="url(#shadow)">
+    <rect x="60" y="150" width="1080" height="360" rx="22" fill="#FFFFFF" opacity="0.66" stroke="#0B1220" stroke-width="2" />
+  </g>
+
+  <!-- left token stream -->
+  <g font-family="JetBrains Mono, 'Courier New', monospace" fill="#0B1220">
+    <text x="92" y="186" font-size="14" font-weight="800">Token Stream</text>
+    <text x="92" y="206" font-size="12" fill="#334155">x_t -&gt; router -&gt; experts -&gt; merge</text>
+  </g>
+
+  <g stroke="#0B1220" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.9">
+    <path id="in" d="M120 260 C 240 220, 320 220, 380 260" />
+    <path id="out" d="M820 260 C 880 220, 980 220, 1080 260" />
+  </g>
+
+  <g filter="url(#glow)">
+    <circle r="7" fill="#06B6D4"><animateMotion path="M120 260 C 240 220, 320 220, 380 260" dur="1.4s" repeatCount="indefinite" /></circle>
+    <circle r="7" fill="#EC4899"><animateMotion path="M120 260 C 240 220, 320 220, 380 260" dur="1.4s" begin="0.35s" repeatCount="indefinite" /></circle>
+    <circle r="7" fill="#8B5CF6"><animateMotion path="M120 260 C 240 220, 320 220, 380 260" dur="1.4s" begin="0.70s" repeatCount="indefinite" /></circle>
+
+    <circle r="7" fill="#0B1220" opacity="0.8"><animateMotion path="M820 260 C 880 220, 980 220, 1080 260" dur="1.4s" repeatCount="indefinite" /></circle>
+    <circle r="7" fill="#06B6D4"><animateMotion path="M820 260 C 880 220, 980 220, 1080 260" dur="1.4s" begin="0.35s" repeatCount="indefinite" /></circle>
+    <circle r="7" fill="#EC4899"><animateMotion path="M820 260 C 880 220, 980 220, 1080 260" dur="1.4s" begin="0.70s" repeatCount="indefinite" /></circle>
+  </g>
+
+  <!-- router galaxy -->
+  <g transform="translate(600, 330)">
+    <!-- outer orbit ring -->
+    <circle cx="0" cy="0" r="138" fill="none" stroke="#0B1220" stroke-width="2" opacity="0.65" />
+    <circle cx="0" cy="0" r="108" fill="none" stroke="#CBD5E1" stroke-width="2" opacity="0.9" />
+
+    <!-- rotating sweep arc -->
+    <g filter="url(#glow)" opacity="0.9">
+      <path d="M 0 -138 A 138 138 0 0 1 96 -100" fill="none" stroke="url(#accent)" stroke-width="10" stroke-linecap="round">
+        <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="5.4s" repeatCount="indefinite" />
+      </path>
+    </g>
+
+    <!-- core router -->
+    <g filter="url(#shadow)">
+      <circle cx="0" cy="0" r="70" fill="#FFFFFF" opacity="0.80" stroke="#0B1220" stroke-width="2" />
+      <circle cx="0" cy="0" r="70" fill="url(#core)" />
+    </g>
+    <text x="-40" y="-8" font-family="JetBrains Mono, 'Courier New', monospace" font-size="14" font-weight="800" fill="#0B1220">ROUTER</text>
+    <text x="-52" y="16" font-family="JetBrains Mono, 'Courier New', monospace" font-size="11" fill="#334155">s = W_r x_t</text>
+    <text x="-44" y="34" font-family="JetBrains Mono, 'Courier New', monospace" font-size="11" fill="#334155">I = topk(s,k)</text>
+
+    <!-- experts around ring -->
+    <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="11" fill="#0B1220" stroke="#0B1220" stroke-width="2">
+      <g id="expert-ring">
+        <g transform="translate(0,-138)">
+          <circle r="16" fill="#BAE6FD" opacity="0.9" />
+          <text x="-10" y="4">E0</text>
+        </g>
+        <g transform="rotate(45) translate(0,-138)">
+          <circle r="16" fill="#DDD6FE" opacity="0.9" />
+          <text x="-10" y="4">E1</text>
+        </g>
+        <g transform="rotate(90) translate(0,-138)">
+          <circle r="16" fill="#FBCFE8" opacity="0.9" />
+          <text x="-10" y="4">E2</text>
+        </g>
+        <g transform="rotate(135) translate(0,-138)">
+          <circle r="16" fill="#BAE6FD" opacity="0.9" />
+          <text x="-10" y="4">E3</text>
+        </g>
+        <g transform="rotate(180) translate(0,-138)">
+          <circle r="16" fill="#DDD6FE" opacity="0.9" />
+          <text x="-10" y="4">E4</text>
+        </g>
+        <g transform="rotate(225) translate(0,-138)">
+          <circle r="16" fill="#FBCFE8" opacity="0.9" />
+          <text x="-10" y="4">E5</text>
+        </g>
+        <g transform="rotate(270) translate(0,-138)">
+          <circle r="16" fill="#BAE6FD" opacity="0.9" />
+          <text x="-10" y="4">E6</text>
+        </g>
+        <g transform="rotate(315) translate(0,-138)">
+          <circle r="16" fill="#DDD6FE" opacity="0.9" />
+          <text x="-10" y="4">E7</text>
+        </g>
+      </g>
+
+      <!-- highlight top-k experts (pulse E1, E3, E6) -->
+      <g filter="url(#glow)">
+        <g transform="rotate(45) translate(0,-138)">
+          <circle r="18" fill="url(#accent)" opacity="0.0">
+            <animate attributeName="opacity" values="0;0.55;0" dur="2.4s" repeatCount="indefinite" />
+          </circle>
+        </g>
+        <g transform="rotate(135) translate(0,-138)">
+          <circle r="18" fill="url(#accent)" opacity="0.0">
+            <animate attributeName="opacity" values="0;0.55;0" dur="2.4s" begin="0.35s" repeatCount="indefinite" />
+          </circle>
+        </g>
+        <g transform="rotate(270) translate(0,-138)">
+          <circle r="18" fill="url(#accent)" opacity="0.0">
+            <animate attributeName="opacity" values="0;0.55;0" dur="2.4s" begin="0.7s" repeatCount="indefinite" />
+          </circle>
+        </g>
+      </g>
+
+      <!-- dispatch spokes -->
+      <g opacity="0.55">
+        <line x1="0" y1="0" x2="96" y2="-100" stroke="url(#accent)" stroke-width="3" />
+        <line x1="0" y1="0" x2="96" y2="100" stroke="url(#accent)" stroke-width="3" />
+        <line x1="0" y1="0" x2="0" y2="138" stroke="url(#accent)" stroke-width="3" />
+      </g>
+
+      <!-- weighted merge card -->
+      <g transform="translate(0, 170)" filter="url(#shadow)">
+        <rect x="-220" y="-52" width="440" height="104" rx="18" fill="#FFFFFF" opacity="0.76" stroke="#0B1220" stroke-width="2" />
+        <rect x="-220" y="-52" width="440" height="6" rx="18" fill="url(#accent)" opacity="0.95" />
+        <text x="-200" y="-20" font-size="13" font-weight="800" fill="#0B1220">Merge (weighted sum)</text>
+        <text x="-200" y="4" font-size="12" fill="#334155">w = softmax(scores[topk])</text>
+        <text x="-200" y="28" font-size="12" fill="#334155">y = sum_i w_i * E_i(x_t)</text>
+
+        <rect x="-200" y="44" width="400" height="8" rx="4" fill="#E2E8F0" />
+        <rect x="-200" y="44" width="170" height="8" rx="4" fill="url(#accent)" opacity="0.75" filter="url(#glow)">
+          <animate attributeName="width" values="120;330;170;260;120" dur="4.8s" repeatCount="indefinite" />
+        </rect>
+      </g>
+    </g>
+  </g>
+
+  <!-- scanlines -->
+  <rect x="60" y="150" width="1080" height="36" fill="url(#accent2)" opacity="0.24">
+    <animate attributeName="y" values="150;472;150" dur="6.8s" repeatCount="indefinite" keyTimes="0;0.5;1" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" />
+  </rect>
+
+  <text x="60" y="548" fill="#334155" font-size="12" font-family="JetBrains Mono, 'Courier New', monospace">Option 02: router galaxy (central gating + orbiting experts + merge).</text>
+</svg>
