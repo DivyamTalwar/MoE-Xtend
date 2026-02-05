@@ -1,4 +1,4 @@
-<svg width="1200" height="300" viewBox="0 0 1200 300" xmlns="http://www.w3.org/2000/svg">
+<svg width="1200" height="340" viewBox="0 0 1200 340" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#F8FAFC" />
@@ -6,28 +6,28 @@
       <stop offset="100%" stop-color="#FCE7F3" />
     </linearGradient>
   </defs>
-  <rect width="1200" height="300" fill="url(#bg)" />
-  <text x="60" y="50" fill="#0F172A" font-size="22" font-family="Space Grotesk, Helvetica, Arial, sans-serif">NTK-by-parts Zones</text>
-  <text x="60" y="78" fill="#475569" font-size="13" font-family="JetBrains Mono, 'Courier New', monospace">Fast clocks → transition → slow clocks</text>
+  <rect width="1200" height="340" fill="url(#bg)" />
+  <text x="60" y="55" fill="#0F172A" font-size="24" font-family="Space Grotesk, Helvetica, Arial, sans-serif">NTK-by-parts Zones</text>
+  <text x="60" y="86" fill="#475569" font-size="14" font-family="JetBrains Mono, 'Courier New', monospace">Fast clocks -> transition -> slow clocks</text>
 
-  <rect x="80" y="140" width="320" height="60" fill="#BAE6FD" stroke="#0F172A" />
-  <rect x="400" y="140" width="320" height="60" fill="#C4B5FD" stroke="#0F172A" />
-  <rect x="720" y="140" width="320" height="60" fill="#F9A8D4" stroke="#0F172A" />
+  <rect x="80" y="150" width="320" height="70" fill="#BAE6FD" stroke="#0F172A" />
+  <rect x="400" y="150" width="320" height="70" fill="#C4B5FD" stroke="#0F172A" />
+  <rect x="720" y="150" width="320" height="70" fill="#F9A8D4" stroke="#0F172A" />
 
-  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="12" fill="#0F172A">
-    <text x="170" y="175">Fast (r > β)</text>
-    <text x="485" y="175">Blend (α ≤ r ≤ β)</text>
-    <text x="820" y="175">Slow (r < α)</text>
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="13" fill="#0F172A">
+    <text x="165" y="190">Fast (r > beta)</text>
+    <text x="485" y="190">Blend (alpha <= r <= beta)</text>
+    <text x="820" y="190">Slow (r < alpha)</text>
   </g>
 
   <g stroke="#06B6D4" stroke-width="2">
-    <line x1="80" y1="210" x2="1040" y2="210" />
-    <circle cx="400" cy="210" r="6" fill="#06B6D4" />
-    <circle cx="720" cy="210" r="6" fill="#EC4899" />
+    <line x1="80" y1="235" x2="1040" y2="235" />
+    <circle cx="400" cy="235" r="6" fill="#06B6D4" />
+    <circle cx="720" cy="235" r="6" fill="#EC4899" />
   </g>
 
-  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="11" fill="#475569">
-    <text x="80" y="240">r(i) = L * theta_i / (2pi) with cutpoints alpha, beta</text>
-    <text x="80" y="258">fast: preserve base, slow: interpolate, mid: blend</text>
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="12" fill="#475569">
+    <text x="80" y="270">r(i) = L * theta_i / (2pi) with cutpoints alpha, beta</text>
+    <text x="80" y="292">fast: preserve base, slow: interpolate, mid: blend</text>
   </g>
 </svg>

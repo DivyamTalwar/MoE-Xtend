@@ -142,7 +142,8 @@ Sampling parameters allow strict control over creativity and determinism: temper
 
 <div align="center" style="font-size: 2.2em; font-weight: 800; letter-spacing: 0.08em;">CORE FORMULAS</div>
 
-<img src="./assets/formulas.svg" width="100%" alt="Formulas"/>
+<img src="./assets/formulas.png" width="100%" alt="Core Formulas"/>
+<img src="./assets/formulas-notes.png" width="100%" alt="Formula Notes"/>
 
 ---
 
