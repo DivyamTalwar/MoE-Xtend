@@ -1,0 +1,2 @@
+# Backwards-compat typo file. Prefer requirements.txt.
+-r requirements.txt

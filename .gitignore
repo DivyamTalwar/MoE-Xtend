@@ -1,2 +1,35 @@
 .DS_Store
 **/.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual envs
+.venv/
+venv/
+ENV/
+
+# Local outputs / logs
+outputs/
+*.jsonl
+*.log
+
+# Model checkpoints / weights (prevent accidental huge commits)
+checkpoints/
+*.safetensors
+*.pt
+*.pth
+*.bin
+*.ckpt
+
+# Local scratch / drafts
+templates/
+cadence_README.md
+profile_README.md

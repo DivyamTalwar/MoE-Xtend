@@ -23,6 +23,7 @@
 <h2 align="center">CONTENTS</h2>
 
 - [Overview](#overview)
+- [Quick Start](#quick-start)
 - [System Flow](#system-flow)
 - [Architecture](#architecture)
 - [Token Stream (Decode)](#token-stream-decode)
@@ -34,6 +35,7 @@
 - [Core Formulas](#core-formulas)
 - [Evaluation](#evaluation)
 - [Determinism + Debugging](#determinism--debugging)
+- [Repository Layout](#repository-layout)
 - [Roadmap](#roadmap)
 
 ---
@@ -47,7 +49,64 @@ MoE-Xtend is a **long-context MoE transformer system spec** with a heavy emphasi
 - **Transparent inference** via deterministic sampling controls, logprobs, and regression-minded metrics.
 - **Readable math**: every major component is paired with formulas and diagrams.
 
-This repository currently tracks `README.md` and `assets/` (diagrams, animations, and formula banners).
+The repo includes:
+
+- `assets/`: all diagrams/animations (local, GitHub-safe)
+- `inference.py`: Harmony-native inference + sampling + metrics/logprobs
+- `server.py`: local Responses-style HTTP server
+- `evals/`: retrieval + long-context sanity checks
+
+---
+
+<h2 id="quick-start" align="center">QUICK START</h2>
+
+**Install**
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Optional (GPU kernels):
+
+```bash
+pip install -r requirements-gpu.txt
+```
+
+**Set checkpoint**
+
+```bash
+export MOE_XTEND_CHECKPOINT=/path/to/checkpoint
+```
+
+Expected checkpoint layout:
+
+- `config.json`
+- one or more `*.safetensors` files
+
+**Run inference**
+
+```bash
+python3 inference.py \
+  --checkpoint "$MOE_XTEND_CHECKPOINT" \
+  --format harmony \
+  --prompt "Design a scheduling agent." \
+  --max_tokens 256
+```
+
+**Run local server**
+
+```bash
+python3 server.py --checkpoint "$MOE_XTEND_CHECKPOINT" --port 8000
+```
+
+**Run evals**
+
+```bash
+python3 evals/needle_haystack.py --checkpoint "$MOE_XTEND_CHECKPOINT"
+python3 evals/passkey_retrieval.py --checkpoint "$MOE_XTEND_CHECKPOINT"
+```
 
 ---
 
@@ -261,6 +320,26 @@ Common long-context failure modes:
 - Mask bugs (off-by-one in window, sinks applied to wrong tokens)
 - KV cache layout mismatch (stride / head grouping)
 - MoE capacity overflow (silent drops -> accuracy cliff)
+
+---
+
+<h2 id="repository-layout" align="center">REPOSITORY LAYOUT</h2>
+
+```text
+assets/                    # diagrams + animated SVGs (local)
+evals/                     # long-context eval scripts
+inference.py               # inference + sampling + logprobs/metrics
+model.py                   # transformer + MoE + RoPE + KV cache
+prompting.py               # Harmony message rendering helpers
+sampling.py                # top-k/top-p/min-p + penalties
+server.py                  # Responses-style local HTTP server
+weights.py                 # safetensors checkpoint loader (MXFP4 decode)
+requirements.txt
+requirements-gpu.txt
+requirments.txt            # compat shim (typo), includes requirements.txt
+LICENSE
+README.md
+```
 
 ---
 
