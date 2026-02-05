@@ -1,0 +1,36 @@
+<svg width="1200" height="520" viewBox="0 0 1200 520" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8FAFC" />
+      <stop offset="45%" stop-color="#E0F2FE" />
+      <stop offset="100%" stop-color="#FCE7F3" />
+    </linearGradient>
+    <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="50%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#EC4899" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="520" fill="url(#bg)" />
+  <text x="60" y="60" fill="#0F172A" font-size="28" font-family="Space Grotesk, Helvetica, Arial, sans-serif">Core Formulas</text>
+  <text x="60" y="92" fill="#475569" font-size="14" font-family="JetBrains Mono, 'Courier New', monospace">Compact reference for routing, attention, RoPE, and sampling.</text>
+
+  <rect x="60" y="110" width="1080" height="6" fill="url(#bar)" />
+
+  <g font-family="JetBrains Mono, 'Courier New', monospace" font-size="15" fill="#0F172A">
+    <text x="80" y="150">Attention: A = softmax((QK^T)/sqrt(d) + mask + sinks)</text>
+    <text x="80" y="178">Output: Y = A · V</text>
+
+    <text x="80" y="220">Router: s = W_r x_t</text>
+    <text x="80" y="248">Top-k: I = topk(s, k)</text>
+    <text x="80" y="276">Weights: w = softmax(s[I])</text>
+    <text x="80" y="304">MoE: y = Σ_i w_i · E_i(x_t)</text>
+
+    <text x="80" y="346">RoPE: θ_i = b^(-2i/d)   λ_i = 2π/θ_i</text>
+    <text x="80" y="374">NTK ratio: r(i) = L·θ_i / (2π)</text>
+    <text x="80" y="402">SwiGLU: σ(α x_glu) · (x_linear + 1)</text>
+
+    <text x="80" y="444">Top-p: keep smallest set with cumulative prob ≥ p</text>
+    <text x="80" y="472">Penalty: logits[t] -= freq_penalty * count[t]</text>
+  </g>
+</svg>
