@@ -28,7 +28,7 @@ moe-xtend = "inference:main"
 moe-xtend-server = "server:main"
 
 [tool.setuptools]
-py-modules = ["model", "weights", "sampling", "prompting", "inference", "server"]
+py-modules = ["model", "weights", "sampling", "prompting", "inference", "server", "observability"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
