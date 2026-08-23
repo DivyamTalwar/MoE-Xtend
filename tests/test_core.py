@@ -6,7 +6,7 @@ from model import Cache, RotaryEmbedding
 
 def test_cache_snapshot_restore_round_trip():
     cache = Cache(batch_size=1, n_ctx=4, n_kv_heads=2, d_head=2, device=torch.device("cpu"))
-    k = torch.arange(8, dtype=torch.bfloat16).reshape(1, 1, 2, 2)
+    k = torch.arange(4, dtype=torch.bfloat16).reshape(1, 1, 2, 2)
     v = k + 10
     cache.extend(k, v)
     snapshot = cache.snapshot()
