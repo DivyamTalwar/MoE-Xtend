@@ -409,6 +409,7 @@ for i in I:
 
 - `model.py`: `MLPBlock.forward` computes router logits, selects `topk`, normalizes weights, and evaluates only the selected experts via batched `einsum`.
 - No expert-parallel all-to-all and no capacity enforcement. This is clarity-first, not a fused-kernel implementation.
+- Set `MOE_XTEND_MOE_DISPATCH=grouped` to use the lower-temporary-memory grouped reference path. The default `gather` path preserves historical behavior. Run `python benchmarks/moe_dispatch.py --device cuda` before choosing a path for your hardware.
 - If you are comparing runs: `topk` ties + dtype can change routing, which changes everything downstream.
 
 ---

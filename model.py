@@ -33,6 +33,7 @@ class ModelConfigs:
     rope_scaling_factor: float = 32.0 # s = L_new / L_orig
     rope_ntk_alpha: float = 1.0
     rope_ntk_beta: float = 32.0
+    moe_dispatch: str = "gather"  # "gather" (reference) or "grouped" (lower temporary memory)
 
 class RMSNorm(nn.Module):
     def __init__(self, hidden_size: int, eps: float, device: Optional[torch.device] = None):
@@ -466,6 +467,9 @@ class MLPBlock(nn.Module):
         self.experts_per_token = configs.experts_per_token
         self.swiglu_limit = configs.swiglu_limit
         self.swiglu_alpha = configs.swiglu_alpha
+        self.dispatch_mode = os.getenv("MOE_XTEND_MOE_DISPATCH", configs.moe_dispatch)
+        if self.dispatch_mode not in {"gather", "grouped"}:
+            raise ValueError("moe_dispatch must be 'gather' or 'grouped'")
 
         # We apply normalisation "before" the MLP block (Pre-LN placement)
         self.norm = RMSNorm(configs.hidden_size, configs.norm_eps, device=device)
@@ -538,67 +542,66 @@ class MLPBlock(nn.Module):
             )
         )
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # As mentioned in the paper: "applying root mean square normalisation
-        # on the activations before each attention and MoE block".
-        # This is also similar to GPT-2 which uses a Pre-LN setup.
-        # (Batch_size, Seq_len, hidden_size) --> (Batch_size, Seq_len, hidden_size)
-        t = self.norm(x)
-
-        # Apply the gating mechanism to determine expert routing
-        # (Batch_size, Seq_len, hidden_size) @ (hidden_size, num_experts)
-        # = (Batch_size, Seq_len, num_experts)
-        g = self.gate(t)
-
-        # Pick the top-k experts for each token
-        # Shape: (Batch_size, Seq_len, experts_per_token)
-        # torch.topk returns (values, indices)
-        experts = torch.topk(g, self.experts_per_token, dim=-1, sorted=True)
-        expert_weights = F.softmax(experts.values, dim=-1)  # how much each token contributes
-        expert_indices = experts.indices
-
-        # Select the corresponding experts’ weights and biases for MLP1
-        # Before selection: (num_experts, hidden_size → 2 * intermediate_size)
-        # After selection:  (Batch_size, Seq_len, experts_per_token, hidden_size → 2 * intermediate_size)
+    def _dispatch_gather(
+        self,
+        t: torch.Tensor,
+        expert_indices: torch.Tensor,
+        expert_weights: torch.Tensor,
+    ) -> torch.Tensor:
+        """Original clarity-first path; materializes selected expert parameters."""
         mlp1_weight = self.mlp1_weight[expert_indices, ...]
         mlp1_bias = self.mlp1_bias[expert_indices, ...]
-
-        # Apply first projection
-        # t: (Batch_size, Seq_len, hidden_size)
-        # mlp1_weight: (Batch_size, Seq_len, experts_per_token, 2 * intermediate_size, hidden_size)
-        #
-        # Each token’s hidden vector (dim = hidden_size)
-        # is multiplied by each expert’s projection (hidden_size → 2 * intermediate_size)
-        # summing over the shared 'hidden_size' dimension.
-        # Resulting shape:
-        # (Batch_size, Seq_len, experts_per_token, 2 * intermediate_size)
-        t = torch.einsum("bth,btkih->btki", t, mlp1_weight) + mlp1_bias
-        t = swiglu(t, alpha=self.swiglu_alpha, limit=self.swiglu_limit)
-
-        # Now perform the second projection which compresses back to model dim
-        # Select the expert parameters again:
-        # Before selection: (num_experts, intermediate_size → hidden_size)
-        # After selection:  (Batch_size, Seq_len, experts_per_token, intermediate_size → hidden_size)
+        hidden = torch.einsum("bth,btkih->btki", t, mlp1_weight) + mlp1_bias
+        hidden = swiglu(hidden, alpha=self.swiglu_alpha, limit=self.swiglu_limit)
         mlp2_weight = self.mlp2_weight[expert_indices, ...]
         mlp2_bias = self.mlp2_bias[expert_indices, ...]
+        hidden = torch.einsum("btki,btkhi->btkh", hidden, mlp2_weight) + mlp2_bias
+        return torch.einsum("btkh,btk->bth", hidden, expert_weights)
 
-        # Apply second projection
-        # t: (Batch_size, Seq_len, experts_per_token, intermediate_size)
-        # mlp2_weight: (Batch_size, Seq_len, experts_per_token, hidden_size, intermediate_size)
-        # Einsum: "btki,btkhi->btkh"
-        # Output: (Batch_size, Seq_len, experts_per_token, hidden_size)
-        t = torch.einsum("btki,btkhi->btkh", t, mlp2_weight) + mlp2_bias
-    
-        # Weighted sum of expert outputs
-        # (Batch_size, Seq_len, experts_per_token, hidden_size)
-        # weighted by (Batch_size, Seq_len, experts_per_token)
-        # Einsum: "btkh,btk->bth"
-        # Result: (Batch_size, Seq_len, hidden_size)
-        t = torch.einsum("btkh,btk->bth", t, expert_weights)
+    def _dispatch_grouped(
+        self,
+        t: torch.Tensor,
+        expert_indices: torch.Tensor,
+        expert_weights: torch.Tensor,
+    ) -> torch.Tensor:
+        """Group token rows by expert to avoid per-token expert-weight tensors.
 
-        # Add residual connection
-        return x + t
-    
+        This is a portable reference implementation for profiling and correctness.
+        A fused grouped-GEMM kernel can replace the loop without changing routing.
+        """
+        shape = t.shape
+        flat_t = t.reshape(-1, shape[-1])
+        flat_indices = expert_indices.reshape(-1, self.experts_per_token)
+        flat_weights = expert_weights.reshape(-1, self.experts_per_token)
+        output = torch.zeros_like(flat_t)
+
+        for expert_id in range(self.num_experts):
+            token_index, slot_index = torch.where(flat_indices == expert_id)
+            if token_index.numel() == 0:
+                continue
+            selected = flat_t.index_select(0, token_index)
+            hidden = F.linear(selected, self.mlp1_weight[expert_id], self.mlp1_bias[expert_id])
+            hidden = swiglu(hidden, alpha=self.swiglu_alpha, limit=self.swiglu_limit)
+            hidden = F.linear(hidden, self.mlp2_weight[expert_id], self.mlp2_bias[expert_id])
+            contribution = hidden * flat_weights[token_index, slot_index].unsqueeze(-1)
+            output.index_add_(0, token_index, contribution)
+
+        return output.reshape(shape)
+
+    def forward(self, x: torch.Tensor, dispatch: Optional[str] = None) -> torch.Tensor:
+        t = self.norm(x)
+        router_logits = self.gate(t)
+        experts = torch.topk(router_logits, self.experts_per_token, dim=-1, sorted=True)
+        expert_weights = F.softmax(experts.values, dim=-1)
+        mode = dispatch or self.dispatch_mode
+        if mode == "gather":
+            update = self._dispatch_gather(t, experts.indices, expert_weights)
+        elif mode == "grouped":
+            update = self._dispatch_grouped(t, experts.indices, expert_weights)
+        else:
+            raise ValueError("dispatch must be 'gather' or 'grouped'")
+        return x + update
+
 class TransformerBlock(nn.Module):
     def __init__(self, configs: ModelConfigs, layer_idx, device: Optional[torch.device] = None):
         super().__init__()

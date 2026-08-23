@@ -35,3 +35,24 @@ def test_rotary_rejects_positions_past_configured_ceiling():
 
     with pytest.raises(ValueError, match="never wrapped"):
         rotary(query, key, offset=torch.tensor([7]))
+
+
+def test_grouped_moe_dispatch_matches_gather_reference():
+    from model import MLPBlock, ModelConfigs
+
+    torch.manual_seed(3)
+    config = ModelConfigs(
+        num_experts=4,
+        experts_per_token=2,
+        hidden_size=8,
+        intermediate_size=4,
+        moe_dispatch="gather",
+    )
+    block = MLPBlock(config, device=torch.device("cpu"))
+    for parameter in block.parameters():
+        torch.nn.init.normal_(parameter, mean=0.0, std=0.05)
+    x = torch.randn((2, 3, 8), dtype=torch.bfloat16)
+
+    gather = block(x, dispatch="gather")
+    grouped = block(x, dispatch="grouped")
+    torch.testing.assert_close(grouped, gather, rtol=0.02, atol=0.02)
