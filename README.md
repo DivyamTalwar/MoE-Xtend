@@ -46,6 +46,9 @@
 
 <h2 id="overview" align="center">OVERVIEW</h2>
 
+> [!IMPORTANT]
+> **Research alpha:** this repository does not ship model weights or published benchmark results. The 131,072-token value is a configured rotary/cache ceiling, not a demonstrated effective context length. Validate quality on your own checkpoint and hardware before relying on it. The implementation is derived from the Apache-2.0 [OpenAI gpt-oss reference implementation](https://github.com/openai/gpt-oss) and adds clarity-first cache, sampling, serving, and evaluation code.
+
 MoE-Xtend is a **long-context MoE transformer system spec** with a heavy emphasis on:
 
 - **Sparse compute, dense capacity** via top-k expert routing.
@@ -133,7 +136,7 @@ Where this is enforced in code:
 
 **Requirements**
 
-- Python 3.9+
+- Python 3.10+
 - A checkpoint directory containing `config.json` and `*.safetensors`
 
 **Install**
@@ -677,4 +680,4 @@ README.md
 ---
 
 ## License
-MIT. See `LICENSE` for details.
+Apache License 2.0. See `LICENSE` for details.

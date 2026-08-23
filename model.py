@@ -196,7 +196,12 @@ class RotaryEmbedding(nn.Module):
         batch_size, num_tokens, num_key_value_heads, head_dim = key.shape
         # Shape: (num_tokens)
         idx = torch.arange(num_tokens, device=query.device, dtype=torch.long) + offset
-        idx = idx % self.max_content_length
+        if idx.numel() and (idx.min().item() < 0 or idx.max().item() >= self.max_content_length):
+            raise ValueError(
+                f"Rotary position out of range: positions must be in [0, {self.max_content_length}), "
+                f"got [{idx.min().item()}, {idx.max().item()}]. Increase the configured context ceiling "
+                "only with a validated scaling policy; positions are never wrapped."
+            )
         # Shapes: (max_context_length, head_dim / 2) --> 0 below being the dim index
         cos = self.cos.index_select(0, idx)
         sin = self.sin.index_select(0, idx)
