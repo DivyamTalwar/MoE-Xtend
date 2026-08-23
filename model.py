@@ -470,6 +470,8 @@ class MLPBlock(nn.Module):
         self.dispatch_mode = os.getenv("MOE_XTEND_MOE_DISPATCH", configs.moe_dispatch)
         if self.dispatch_mode not in {"gather", "grouped"}:
             raise ValueError("moe_dispatch must be 'gather' or 'grouped'")
+        self.capture_router_stats = False
+        self._last_router_stats = None
 
         # We apply normalisation "before" the MLP block (Pre-LN placement)
         self.norm = RMSNorm(configs.hidden_size, configs.norm_eps, device=device)
@@ -542,6 +544,39 @@ class MLPBlock(nn.Module):
             )
         )
 
+    def set_router_stats(self, enabled: bool = True) -> None:
+        """Enable low-volume router summaries; disabled by default to avoid syncs."""
+        self.capture_router_stats = bool(enabled)
+        if not enabled:
+            self._last_router_stats = None
+
+    @property
+    def router_stats(self):
+        return self._last_router_stats
+
+    def _record_router_stats(self, experts, expert_weights) -> None:
+        with torch.no_grad():
+            counts = torch.bincount(experts.indices.reshape(-1), minlength=self.num_experts)
+            total = counts.sum().clamp_min(1)
+            utilization = counts.float() / total
+            nonzero = utilization[utilization > 0]
+            entropy = -(nonzero * nonzero.log()).sum()
+            mean_load = counts.float().mean().clamp_min(1)
+            margin = (
+                (experts.values[..., 0] - experts.values[..., 1]).float().mean()
+                if self.experts_per_token > 1
+                else torch.tensor(float("nan"), device=counts.device)
+            )
+            self._last_router_stats = {
+                "routes": int(total.item()),
+                "counts": counts.cpu().tolist(),
+                "utilization": utilization.cpu().tolist(),
+                "entropy": float(entropy.item()),
+                "max_to_mean_load": float((counts.max() / mean_load).item()),
+                "mean_top1_weight": float(expert_weights[..., 0].float().mean().item()),
+                "mean_top1_margin": float(margin.item()),
+            }
+
     def _dispatch_gather(
         self,
         t: torch.Tensor,
@@ -593,6 +628,8 @@ class MLPBlock(nn.Module):
         router_logits = self.gate(t)
         experts = torch.topk(router_logits, self.experts_per_token, dim=-1, sorted=True)
         expert_weights = F.softmax(experts.values, dim=-1)
+        if self.capture_router_stats:
+            self._record_router_stats(experts, expert_weights)
         mode = dispatch or self.dispatch_mode
         if mode == "gather":
             update = self._dispatch_gather(t, experts.indices, expert_weights)
@@ -642,6 +679,17 @@ class Transformer(nn.Module):
             device=device,
             dtype=torch.bfloat16
         )
+
+    def set_router_stats(self, enabled: bool = True) -> None:
+        for block in self.block:
+            block.mlp.set_router_stats(enabled)
+
+    def router_stats(self):
+        return [
+            {"layer": layer_idx, **block.mlp.router_stats}
+            for layer_idx, block in enumerate(self.block)
+            if block.mlp.router_stats is not None
+        ]
 
     def forward(self, x: torch.Tensor, caches: Optional[List[Cache]] = None) -> torch.Tensor:
         # KV caches

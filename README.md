@@ -412,6 +412,19 @@ for i in I:
 - Set `MOE_XTEND_MOE_DISPATCH=grouped` to use the lower-temporary-memory grouped reference path. The default `gather` path preserves historical behavior. Run `python benchmarks/moe_dispatch.py --device cuda` before choosing a path for your hardware.
 - If you are comparing runs: `topk` ties + dtype can change routing, which changes everything downstream.
 
+**Router telemetry (opt-in)**
+
+```python
+from observability import router_report, write_router_report
+
+model.set_router_stats(True)
+_ = model(input_ids, caches=caches)
+print(router_report(model))
+write_router_report(model, "router-report.json")
+```
+
+Telemetry reports per-layer expert counts/utilization, entropy, max-to-mean load, top-1 weight and routing margin. Collection is off by default because device-to-host summaries synchronize execution.
+
 ---
 
 <h2 id="attention-stack" align="center">ATTENTION STACK</h2>
